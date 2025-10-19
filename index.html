@@ -41,6 +41,9 @@
       padding: 10px;
       display: none;
     }
+    #menu label {
+      color: #fff;
+    }
     #menu input {
       width: 220px;
       padding: 4px;
@@ -51,11 +54,15 @@
     }
     #menu button {
       margin-top: 6px;
-      background: #0f0;
+      background: #007BFF; /* blue */
+      color: #fff;          /* white text */
       border: none;
       padding: 5px 12px;
       border-radius: 4px;
       cursor: pointer;
+    }
+    #menu button:hover {
+      background: #3399ff; /* lighter blue on hover */
     }
   </style>
   <link href="TemplateData/style.css" rel="stylesheet">
@@ -74,7 +81,7 @@
   </div>
 
   <script>
-    // Load Unity WebGL game
+    // Load the Unity WebGL game
     var Module = {
       TOTAL_MEMORY: 268435456,
       backgroundColor: "#222C36",
@@ -94,7 +101,7 @@
     const linkInput = document.getElementById("linkInput");
     const saveBtn = document.getElementById("saveBtn");
 
-    // Load saved link
+    // Load saved link or default
     linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
 
     menuBtn.onclick = () => {
@@ -105,7 +112,7 @@
       const link = linkInput.value.trim();
       if (link) {
         localStorage.setItem("redirectLink", link);
-        alert("Link saved! Press '>' to go there.");
+        alert("✅ Link saved! Press '>' to go there.");
         menu.style.display = "none";
       }
     };
