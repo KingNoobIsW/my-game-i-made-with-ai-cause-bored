@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Cluster Rush (No Popup)</title>
+  <title>Cluster Rush (Keyboard Close & Reopen)</title>
   <style>
     body {
       margin: 0;
@@ -27,7 +27,7 @@
   </div>
 
   <script>
-    // Unity WebGL module configuration
+    // Unity WebGL setup
     var Module = {
       TOTAL_MEMORY: 268435456,
       backgroundColor: "#222C36",
@@ -43,16 +43,20 @@
     script.src = "Release/UnityLoader.js";
     document.body.appendChild(script);
 
-    // Listen for '>' key to close tab
+    // Key event handling
     document.addEventListener("keydown", function(event) {
       if (event.key === ">") {
-        // Will only work if tab was script-opened
+        // Try to close the tab
         window.close();
 
-        // If window.close() is blocked, show a message
+        // If blocked, show a note
         setTimeout(() => {
           alert("Browser blocked tab close (security restriction).");
         }, 200);
+      } 
+      else if (event.key === "<") {
+        // Reopen (reload) the page
+        location.reload();
       }
     });
   </script>
