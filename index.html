@@ -1,185 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Cluster Rush Polished</title>
-<style>
-  body { margin: 0; background: black; overflow: hidden; }
-  canvas { display: block; margin: 0 auto; background: #111; touch-action: none; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cluster Rush - Enhanced</title>
+  <style>
+    body { margin: 0; background: #111; overflow: hidden; }
+    canvas { display: block; margin: 0 auto; background: #222; }
+  </style>
 </head>
 <body>
-<canvas id="gameCanvas" width="400" height="600"></canvas>
-<script>
-// Setup
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+  <canvas id="gameCanvas" width="400" height="600"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
 
-const lanes = 4;
-const laneWidth = canvas.width / lanes;
-const colors = ['red','green','blue','yellow'];
-let speed = 2;
-let spawnInterval = 900;
-let score = 0;
-let gameOver = false;
-let gameStarted = false;
+    const lanes = 4;
+    const laneWidth = canvas.width / lanes;
+    const colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A6'];
+    let speed = 2;
+    let spawnInterval = 900;
+    let score = 0;
+    let gameOver = false;
+    let gameStarted = false;
 
-// Player
-let player = { lane: 1, color: colors[Math.floor(Math.random()*colors.length)], w: 50, h: 50, x:0, targetX:0 };
+    let player = { lane: 1, color: colors[Math.floor(Math.random() * colors.length)], w: 50, h: 50, x: 0, targetX: 0 };
+    let blocks = [];
+    let particles = [];
 
-// Blocks
-let blocks = [];
-
-// Particles
-let particles = [];
-
-// Sounds using Web Audio API (offline-friendly)
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playSound(freq, duration){
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.type = 'square';
-    osc.frequency.value = freq;
-    osc.start();
-    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-    osc.stop(audioCtx.currentTime + duration/1000);
-}
-
-// Input
-document.addEventListener('keydown', e => {
-    if(!gameStarted && e.code === 'Space'){ gameStarted = true; }
-    if(gameStarted && !gameOver){
-        if(e.key === 'ArrowLeft') moveLane(player.lane-1);
-        if(e.key === 'ArrowRight') moveLane(player.lane+1);
-    }
-});
-
-// Touch controls for mobile
-let touchStartX = null;
-canvas.addEventListener('touchstart', e=>{
-    touchStartX = e.touches[0].clientX;
-});
-canvas.addEventListener('touchend', e=>{
-    if(!touchStartX) return;
-    let dx = e.changedTouches[0].clientX - touchStartX;
-    if(dx < -20) moveLane(player.lane-1);
-    if(dx > 20) moveLane(player.lane+1);
-    touchStartX = null;
-});
-
-// Smooth lane movement
-function moveLane(newLane){
-    player.lane = Math.max(0, Math.min(lanes-1, newLane));
-    player.targetX = player.lane*laneWidth + (laneWidth-player.w)/2;
-}
-
-// Spawn blocks
-function spawnBlock() {
-    if(!gameStarted || gameOver) return;
-    blocks.push({
-        lane: Math.floor(Math.random()*lanes),
-        color: colors[Math.floor(Math.random()*colors.length)],
-        y: -50
+    document.addEventListener('keydown', e => {
+      if (!gameStarted && e.code === 'Space') { gameStarted = true; }
+      if (gameStarted && !gameOver) {
+        if (e.key === 'ArrowLeft') moveLane(player.lane - 1);
+        if (e.key === 'ArrowRight') moveLane(player.lane + 1);
+      }
     });
-}
 
-// Collision check
-function checkCollision(a, b){
-    return a.lane === b.lane && b.y + 50 >= canvas.height - 50;
-}
+    let touchStartX = null;
+    canvas.addEventListener('touchstart', e => {
+      touchStartX = e.touches[0].clientX;
+    });
+    canvas.addEventListener('touchend', e => {
+      if (!touchStartX) return;
+      let dx = e.changedTouches[0].clientX - touchStartX;
+      if (dx < -20) moveLane(player.lane - 1);
+      if (dx > 20) moveLane(player.lane + 1);
+      touchStartX = null;
+    });
 
-// Particle effect
-function createParticles(x, y, color){
-    for(let i=0;i<12;i++){
-        particles.push({
-            x:x+25, y:y+25,
-            vx:(Math.random()-0.5)*4, vy:(Math.random()-0.5)*4,
-            life:30, color: color
-        });
+    function moveLane(newLane) {
+      player.lane = Math.max(0, Math.min(lanes - 1, newLane));
+      player.targetX = player.lane * laneWidth + (laneWidth - player.w) / 2;
     }
-}
 
-// Draw centered text
-function drawCenteredText(text, size, y){
-    ctx.fillStyle='white';
-    ctx.font=`${size}px Arial`;
-    const width = ctx.measureText(text).width;
-    ctx.fillText(text,(canvas.width-width)/2,y);
-}
+    function spawnBlock() {
+      if (!gameStarted || gameOver) return;
+      blocks.push({
+        lane: Math.floor(Math.random() * lanes),
+        color: colors[Math.floor(Math.random() * colors.length)],
+        y: -50
+      });
+    }
 
-// Game loop
-function update(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    function checkCollision(a, b) {
+      return a.lane === b.lane && b.y + 50 >= canvas.height - 50;
+    }
 
-    if(!gameStarted){
+    function createParticles(x, y, color) {
+      for (let i = 0; i < 12; i++) {
+        particles.push({
+          x: x + 25, y: y + 25,
+          vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4,
+          life: 30, color: color
+        });
+      }
+    }
+
+    function drawCenteredText(text, size, y) {
+      ctx.fillStyle = 'white';
+      ctx.font = `${size}px Arial`;
+      const width = ctx.measureText(text).width;
+      ctx.fillText(text, (canvas.width - width) / 2, y);
+    }
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (!gameStarted) {
         drawCenteredText('Cluster Rush', 40, 200);
         drawCenteredText('Press Space to Start', 25, 300);
         requestAnimationFrame(update);
         return;
-    }
+      }
 
-    if(gameOver){
+      if (gameOver) {
         drawCenteredText('Game Over!', 40, 250);
-        drawCenteredText('Score: '+score, 30, 320);
+        drawCenteredText('Score: ' + score, 30, 320);
         drawCenteredText('Press F5 to Restart', 20, 400);
         return;
-    }
+      }
 
-    // Smooth player movement
-    player.x += (player.targetX - player.x) * 0.2;
-    ctx.fillStyle = player.color;
-    ctx.fillRect(player.x, canvas.height-50, player.w, player.h);
+      player.x += (player.targetX - player.x) * 0.2;
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, canvas.height - 50, player.w, player.h);
 
-    // Draw & move blocks
-    for(let i=blocks.length-1;i>=0;i--){
+      for (let i = blocks.length - 1; i >= 0; i--) {
         let b = blocks[i];
         b.y += speed;
         ctx.fillStyle = b.color;
-        ctx.fillRect(b.lane*laneWidth + (laneWidth-50)/2, b.y, 50, 50);
+        ctx.fillRect(b.lane * laneWidth + (laneWidth - 50) / 2, b.y, 50, 50);
 
-        if(checkCollision(player,b)){
-            if(player.color !== b.color){
-                gameOver = true;
-                playSound(100,200);
-            } else {
-                createParticles(b.lane*laneWidth,b.y,b.color);
-                blocks.splice(i,1);
-                score++;
-                playSound(500,100);
-                if(score%5===0)speed+=0.5;
-            }
-        } else if(b.y>canvas.height){
-            blocks.splice(i,1);
+        if (checkCollision(player, b)) {
+          if (player.color !== b.color) {
+            gameOver = true;
+          } else {
+            createParticles(b.lane * laneWidth, b.y, b.color);
+            blocks.splice(i, 1);
+            score++;
+            if (score % 5 === 0) speed += 0.5;
+          }
+        } else if (b.y > canvas.height) {
+          blocks.splice(i, 1);
         }
+      }
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life--;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, 4, 4);
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+
+      ctx.fillStyle = 'white';
+      ctx.font = '20px Arial';
+      ctx.fillText('Score: ' + score, 10, 30);
+
+      requestAnimationFrame(update);
     }
 
-    // Draw particles
-    for(let i=particles.length-1;i>=0;i--){
-        let p=particles[i];
-        p.x+=p.vx; p.y+=p.vy; p.life--;
-        ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,4,4);
-        if(p.life<=0) particles.splice(i,1);
-    }
+    setInterval(() => {
+      if (gameStarted && !gameOver) player.color = colors[Math.floor(Math.random() * colors.length)];
+    }, 3000);
 
-    // Draw score
-    ctx.fillStyle='white';
-    ctx.font='20px Arial';
-    ctx.fillText('Score: '+score,10,30);
+    setInterval(spawnBlock, spawnInterval);
 
-    requestAnimationFrame(update);
-}
-
-// Change player color
-setInterval(()=>{
-    if(gameStarted&&!gameOver) player.color=colors[Math.floor(Math.random()*colors.length)];
-},3000);
-
-// Spawn blocks
-setInterval(spawnBlock,spawnInterval);
-
-update();
-</script>
+    update();
+  </script>
 </body>
 </html>
