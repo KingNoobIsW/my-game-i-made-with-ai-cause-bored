@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Cluster Rush (Keyboard Close & Reopen)</title>
+  <title>Cluster Rush (Google Classroom Shortcut)</title>
   <style>
     body {
       margin: 0;
@@ -22,12 +22,12 @@
   <script src="TemplateData/UnityProgress.js"></script>
 </head>
 <body class="template">
-  <div class="template-wrap clear">
+  <div class="template-wrap clear" id="game-container">
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
   </div>
 
   <script>
-    // Unity WebGL setup
+    // Load the Unity WebGL game
     var Module = {
       TOTAL_MEMORY: 268435456,
       backgroundColor: "#222C36",
@@ -38,25 +38,14 @@
       memUrl: "Release/NG.mem",
     };
 
-    // Load Unity WebGL
     const script = document.createElement("script");
     script.src = "Release/UnityLoader.js";
     document.body.appendChild(script);
 
-    // Key event handling
+    // Key handler: '>' opens Google Classroom
     document.addEventListener("keydown", function(event) {
       if (event.key === ">") {
-        // Try to close the tab
-        window.close();
-
-        // If blocked, show a note
-        setTimeout(() => {
-          alert("Browser blocked tab close (security restriction).");
-        }, 200);
-      } 
-      else if (event.key === "<") {
-        // Reopen (reload) the page
-        location.reload();
+        window.location.href = "https://classroom.google.com/h";
       }
     });
   </script>
