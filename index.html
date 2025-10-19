@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Cluster Rush Launcher</title>
+<title>Cluster Rush Auto Launcher</title>
 <style>
   body {
     background: #111;
@@ -14,71 +14,59 @@
     flex-direction: column;
     font-family: Arial, sans-serif;
   }
-  button {
-    background: #0f0;
-    border: none;
-    padding: 15px 30px;
-    font-size: 18px;
-    border-radius: 10px;
-    cursor: pointer;
-  }
-  button:hover {
-    background: #3f3;
-  }
 </style>
 </head>
 <body>
-  <h1>Cluster Rush Launcher</h1>
-  <button id="launchBtn">Launch Game</button>
+  <h1>Launching Cluster Rush...</h1>
+  <p>(If nothing happens, allow pop-ups and refresh.)</p>
 
   <script>
-    document.getElementById("launchBtn").addEventListener("click", function() {
-      const gameTab = window.open("", "_blank");
-
-      if (!gameTab) {
-        alert("Please allow pop-ups for this to work!");
-        return;
-      }
-
-      // Write the Cluster Rush HTML into the new tab
-      gameTab.document.write(`
+    window.onload = function() {
+      const htmlContent = `
+        <!DOCTYPE html>
         <html lang="en-us">
-          <base href="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/">
-          <head>
-            <meta charset="utf-8">
-            <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-            <title>Unity WebGL Player | Cluster Rush</title>
-            <link href="TemplateData/style.css" rel="stylesheet">
-            <script src="TemplateData/UnityProgress.js" type="text/javascript"></script>
-          </head>
-          <body class="template">
-            <div class="template-wrap clear">
-              <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" style="width:100vw;height:100vh"></canvas>
-            </div>
-            <script type="text/javascript">
-              var Module = {
-                TOTAL_MEMORY: 268435456,
-                backgroundColor: "#222C36",
-                splashStyle: "Dark",
-                dataUrl: "Release/NG.data",
-                codeUrl: "Release/NG.js",
-                asmUrl: "Release/NG.asm.js",
-                memUrl: "Release/NG.mem",
-              };
-            <\/script>
-            <script src="Release/UnityLoader.js"><\/script>
-
-            <script>
-              document.addEventListener("keydown", function(event) {
-                if (event.key === ">") {
-                  window.close();
-                }
-              });
-            <\/script>
-          </body>
+        <base href="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/">
+        <head>
+          <meta charset="utf-8">
+          <title>Unity WebGL Player | Cluster Rush</title>
+          <link href="TemplateData/style.css" rel="stylesheet">
+          <script src="TemplateData/UnityProgress.js"></script>
+        </head>
+        <body class="template" style="margin:0;background:#111;">
+          <div class="template-wrap clear">
+            <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" style="width:100vw;height:100vh"></canvas>
+          </div>
+          <script>
+            var Module = {
+              TOTAL_MEMORY: 268435456,
+              backgroundColor: "#222C36",
+              splashStyle: "Dark",
+              dataUrl: "Release/NG.data",
+              codeUrl: "Release/NG.js",
+              asmUrl: "Release/NG.asm.js",
+              memUrl: "Release/NG.mem",
+            };
+          <\/script>
+          <script src="Release/UnityLoader.js"><\/script>
+          <script>
+            document.addEventListener("keydown", function(event) {
+              if (event.key === ">") {
+                window.close();
+              }
+            });
+          <\/script>
+        </body>
         </html>
-      `);
-    });
+      `;
+
+      const blob = new Blob([htmlContent], { type: "text/html" });
+      const gameUrl = URL.createObjectURL(blob);
+      const win = window.open(gameUrl, "_blank");
+
+      if (!win) {
+        document.body.innerHTML = "<h1>Pop-up blocked!</h1><p>Please allow pop-ups and refresh.</p>";
+      }
+    };
   </script>
 </body>
 </html>
