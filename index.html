@@ -39,6 +39,11 @@ document.addEventListener('keydown', e => {
     if(e.key==='ArrowLeft') moveLane(player.lane-1);
     if(e.key==='ArrowRight') moveLane(player.lane+1);
   }
+  
+  // Close tab/window when + key is pressed
+  if(e.key === '+'){
+    window.close(); // works if opened via window.open
+  }
 });
 
 // Touch input
