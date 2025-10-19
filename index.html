@@ -1,72 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-us">
+<base href="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/">
 <head>
-<meta charset="UTF-8">
-<title>Cluster Rush Auto Launcher</title>
-<style>
-  body {
-    background: #111;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    flex-direction: column;
-    font-family: Arial, sans-serif;
-  }
-</style>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Cluster Rush (No Popup)</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      touch-action: none;
+    }
+  </style>
+  <link href="TemplateData/style.css" rel="stylesheet">
+  <script src="TemplateData/UnityProgress.js"></script>
 </head>
-<body>
-  <h1>Launching Cluster Rush...</h1>
-  <p>(If nothing happens, allow pop-ups and refresh.)</p>
+<body class="template">
+  <div class="template-wrap clear">
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+  </div>
 
   <script>
-    window.onload = function() {
-      const htmlContent = `
-        <!DOCTYPE html>
-        <html lang="en-us">
-        <base href="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/">
-        <head>
-          <meta charset="utf-8">
-          <title>Unity WebGL Player | Cluster Rush</title>
-          <link href="TemplateData/style.css" rel="stylesheet">
-          <script src="TemplateData/UnityProgress.js"></script>
-        </head>
-        <body class="template" style="margin:0;background:#111;">
-          <div class="template-wrap clear">
-            <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" style="width:100vw;height:100vh"></canvas>
-          </div>
-          <script>
-            var Module = {
-              TOTAL_MEMORY: 268435456,
-              backgroundColor: "#222C36",
-              splashStyle: "Dark",
-              dataUrl: "Release/NG.data",
-              codeUrl: "Release/NG.js",
-              asmUrl: "Release/NG.asm.js",
-              memUrl: "Release/NG.mem",
-            };
-          <\/script>
-          <script src="Release/UnityLoader.js"><\/script>
-          <script>
-            document.addEventListener("keydown", function(event) {
-              if (event.key === ">") {
-                window.close();
-              }
-            });
-          <\/script>
-        </body>
-        </html>
-      `;
-
-      const blob = new Blob([htmlContent], { type: "text/html" });
-      const gameUrl = URL.createObjectURL(blob);
-      const win = window.open(gameUrl, "_blank");
-
-      if (!win) {
-        document.body.innerHTML = "<h1>Pop-up blocked!</h1><p>Please allow pop-ups and refresh.</p>";
-      }
+    // Unity WebGL module configuration
+    var Module = {
+      TOTAL_MEMORY: 268435456,
+      backgroundColor: "#222C36",
+      splashStyle: "Dark",
+      dataUrl: "Release/NG.data",
+      codeUrl: "Release/NG.js",
+      asmUrl: "Release/NG.asm.js",
+      memUrl: "Release/NG.mem",
     };
+
+    // Load Unity WebGL
+    const script = document.createElement("script");
+    script.src = "Release/UnityLoader.js";
+    document.body.appendChild(script);
+
+    // Listen for '>' key to close tab
+    document.addEventListener("keydown", function(event) {
+      if (event.key === ">") {
+        // Will only work if tab was script-opened
+        window.close();
+
+        // If window.close() is blocked, show a message
+        setTimeout(() => {
+          alert("Browser blocked tab close (security restriction).");
+        }, 200);
+      }
+    });
   </script>
 </body>
 </html>
