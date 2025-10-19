@@ -2,179 +2,83 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Cluster Rush Standalone</title>
+<title>Cluster Rush Launcher</title>
 <style>
-  body { margin:0; overflow:hidden; background:#111; }
-  canvas { display:block; margin:0 auto; background:#111; touch-action: none; }
+  body {
+    background: #111;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+  }
+  button {
+    background: #0f0;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #3f3;
+  }
 </style>
 </head>
 <body>
-<canvas id="gameCanvas" width="400" height="600"></canvas>
-<script>
-// Canvas setup
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+  <h1>Cluster Rush Launcher</h1>
+  <button id="launchBtn">Launch Game</button>
 
-// Game settings
-const lanes = 4;
-const colors = ['#FF3F3F','#3FFF3F','#3F3FFF','#FFF33F'];
-let speed = 0.02; // speed along z-axis
-let spawnInterval = 60; // frames
-let score = 0;
-let gameOver = false;
-let gameStarted = false;
+  <script>
+    document.getElementById("launchBtn").addEventListener("click", function() {
+      const gameTab = window.open("", "_blank");
 
-// Player
-let player = { lane: 1, color: colors[Math.floor(Math.random()*colors.length)], targetLane:1 };
+      if (!gameTab) {
+        alert("Please allow pop-ups for this to work!");
+        return;
+      }
 
-// Blocks and particles
-let blocks = [];
-let particles = [];
-let frameCount = 0;
+      // Write the Cluster Rush HTML into the new tab
+      gameTab.document.write(`
+        <html lang="en-us">
+          <base href="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/">
+          <head>
+            <meta charset="utf-8">
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+            <title>Unity WebGL Player | Cluster Rush</title>
+            <link href="TemplateData/style.css" rel="stylesheet">
+            <script src="TemplateData/UnityProgress.js" type="text/javascript"></script>
+          </head>
+          <body class="template">
+            <div class="template-wrap clear">
+              <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" style="width:100vw;height:100vh"></canvas>
+            </div>
+            <script type="text/javascript">
+              var Module = {
+                TOTAL_MEMORY: 268435456,
+                backgroundColor: "#222C36",
+                splashStyle: "Dark",
+                dataUrl: "Release/NG.data",
+                codeUrl: "Release/NG.js",
+                asmUrl: "Release/NG.asm.js",
+                memUrl: "Release/NG.mem",
+              };
+            <\/script>
+            <script src="Release/UnityLoader.js"><\/script>
 
-// Input
-document.addEventListener('keydown', e => {
-  if(!gameStarted && e.code==='Space'){ gameStarted = true; }
-  if(gameStarted && !gameOver){
-    if(e.key==='ArrowLeft') moveLane(player.lane-1);
-    if(e.key==='ArrowRight') moveLane(player.lane+1);
-  }
-  
-  // Close tab/window when + key is pressed
-  if(e.key === '+'){
-    window.close(); // works if opened via window.open
-  }
-});
-
-// Touch input
-let touchStartX = null;
-canvas.addEventListener('touchstart', e=>{ touchStartX=e.touches[0].clientX; });
-canvas.addEventListener('touchend', e=>{
-  if(!touchStartX) return;
-  let dx = e.changedTouches[0].clientX - touchStartX;
-  if(dx<-20) moveLane(player.lane-1);
-  if(dx>20) moveLane(player.lane+1);
-  touchStartX=null;
-});
-
-function moveLane(lane){
-  player.targetLane = Math.max(0, Math.min(lanes-1,lane));
-}
-
-// Perspective projection
-function project(lane, z){
-  let perspective = 300/(z+1);
-  let laneCenter = (lane-(lanes-1)/2) * 100 * perspective + canvas.width/2 - 25*perspective;
-  let size = 50*perspective;
-  return { x: laneCenter, size };
-}
-
-// Spawn block
-function spawnBlock(){
-  blocks.push({
-    lane: Math.floor(Math.random()*lanes),
-    color: colors[Math.floor(Math.random()*colors.length)],
-    z:1
-  });
-}
-
-// Collision check
-function checkCollision(p, b){
-  return b.z<0.05 && b.lane===p.lane;
-}
-
-// Particles
-function createParticles(x,y,color){
-  for(let i=0;i<12;i++){
-    particles.push({x,y,vx:(Math.random()-0.5)*4,vy:(Math.random()-0.5)*4,life:30,color});
-  }
-}
-
-// Draw centered text
-function drawCenteredText(text,size,y){
-  ctx.fillStyle='white';
-  ctx.font=`${size}px Arial`;
-  const width = ctx.measureText(text).width;
-  ctx.fillText(text,(canvas.width-width)/2,y);
-}
-
-// Game loop
-function update(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  if(!gameStarted){
-    drawCenteredText('Cluster Rush',40,200);
-    drawCenteredText('Press Space to Start',25,300);
-    requestAnimationFrame(update);
-    return;
-  }
-
-  if(gameOver){
-    drawCenteredText('Game Over!',40,250);
-    drawCenteredText('Score: '+score,30,320);
-    drawCenteredText('Press F5 to Restart',20,400);
-    return;
-  }
-
-  frameCount++;
-  if(frameCount%spawnInterval===0) spawnBlock();
-
-  // Smooth player movement
-  if(player.lane!==player.targetLane){
-    if(player.lane<player.targetLane) player.lane += 0.1;
-    else player.lane -=0.1;
-  }
-
-  // Draw lane lines
-  for(let l=0;l<lanes;l++){
-    ctx.strokeStyle='#333';
-    ctx.beginPath();
-    ctx.moveTo(canvas.width/2 + (l-(lanes-1)/2)*100, canvas.height);
-    ctx.lineTo(canvas.width/2 + (l-(lanes-1)/2)*100,0);
-    ctx.stroke();
-  }
-
-  // Move & draw blocks
-  for(let i=blocks.length-1;i>=0;i--){
-    let b=blocks[i];
-    b.z -= speed;
-    let p = project(Math.round(b.lane),b.z);
-    if(p.size<=0){ blocks.splice(i,1); continue; }
-    ctx.fillStyle=b.color;
-    ctx.fillRect(p.x,canvas.height/2 - p.size/2 + 150, p.size, p.size);
-
-    if(checkCollision(player,b)){
-      if(player.color!==b.color){ gameOver=true; }
-      else{ score++; blocks.splice(i,1); createParticles(p.x+25, canvas.height-25,b.color); if(score%5===0) speed+=0.005;}
-    }
-  }
-
-  // Draw particles
-  for(let i=particles.length-1;i>=0;i--){
-    let p=particles[i];
-    p.x+=p.vx; p.y+=p.vy; p.life--;
-    ctx.fillStyle=p.color;
-    ctx.fillRect(p.x,p.y,4,4);
-    if(p.life<=0) particles.splice(i,1);
-  }
-
-  // Draw player
-  let playerProj = project(Math.round(player.lane),0);
-  ctx.fillStyle=player.color;
-  ctx.fillRect(playerProj.x,canvas.height-50,playerProj.size,playerProj.size);
-
-  // Draw score
-  ctx.fillStyle='white';
-  ctx.font='20px Arial';
-  ctx.fillText('Score: '+score,10,30);
-
-  requestAnimationFrame(update);
-}
-
-// Change player color every 3 seconds
-setInterval(()=>{ if(gameStarted && !gameOver) player.color = colors[Math.floor(Math.random()*colors.length)]; },3000);
-
-update();
-</script>
+            <script>
+              document.addEventListener("keydown", function(event) {
+                if (event.key === ">") {
+                  window.close();
+                }
+              });
+            <\/script>
+          </body>
+        </html>
+      `);
+    });
+  </script>
 </body>
 </html>
