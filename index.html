@@ -1,153 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cluster Rush - Enhanced</title>
-  <style>
-    body { margin: 0; background: #111; overflow: hidden; }
-    canvas { display: block; margin: 0 auto; background: #222; }
-  </style>
+<meta charset="UTF-8">
+<title>Cluster Rush 3D</title>
+<style>
+  body { margin:0; overflow:hidden; background:#111; }
+  canvas { display:block; margin:0 auto; background:#111; }
+</style>
 </head>
 <body>
-  <canvas id="gameCanvas" width="400" height="600"></canvas>
-  <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+<canvas id="gameCanvas" width="400" height="600"></canvas>
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
 
-    const lanes = 4;
-    const laneWidth = canvas.width / lanes;
-    const colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A6'];
-    let speed = 2;
-    let spawnInterval = 900;
-    let score = 0;
-    let gameOver = false;
-    let gameStarted = false;
+const lanes = 4;
+const laneWidth = 1; // used only for relative positions
+const colors = ['#FF3F3F','#3FFF3F','#3F3FFF','#FFF33F'];
+let speed = 0.02; // speed along z-axis
+let spawnInterval = 60; // frames
+let score = 0;
+let gameOver = false;
+let gameStarted = false;
 
-    let player = { lane: 1, color: colors[Math.floor(Math.random() * colors.length)], w: 50, h: 50, x: 0, targetX: 0 };
-    let blocks = [];
-    let particles = [];
+// player in lane
+let player = { lane: 1, color: colors[Math.floor(Math.random()*colors.length)], x:0, targetX:0, z:0 };
 
-    document.addEventListener('keydown', e => {
-      if (!gameStarted && e.code === 'Space') { gameStarted = true; }
-      if (gameStarted && !gameOver) {
-        if (e.key === 'ArrowLeft') moveLane(player.lane - 1);
-        if (e.key === 'ArrowRight') moveLane(player.lane + 1);
-      }
-    });
+// blocks
+let blocks = [];
+let particles = [];
 
-    let touchStartX = null;
-    canvas.addEventListener('touchstart', e => {
-      touchStartX = e.touches[0].clientX;
-    });
-    canvas.addEventListener('touchend', e => {
-      if (!touchStartX) return;
-      let dx = e.changedTouches[0].clientX - touchStartX;
-      if (dx < -20) moveLane(player.lane - 1);
-      if (dx > 20) moveLane(player.lane + 1);
-      touchStartX = null;
-    });
+let frameCount = 0;
 
-    function moveLane(newLane) {
-      player.lane = Math.max(0, Math.min(lanes - 1, newLane));
-      player.targetX = player.lane * laneWidth + (laneWidth - player.w) / 2;
+// Input
+document.addEventListener('keydown', e => {
+  if(!gameStarted && e.code==='Space'){ gameStarted = true; }
+  if(gameStarted && !gameOver){
+    if(e.key==='ArrowLeft') moveLane(player.lane-1);
+    if(e.key==='ArrowRight') moveLane(player.lane+1);
+  }
+});
+
+let touchStartX = null;
+canvas.addEventListener('touchstart', e=>{ touchStartX=e.touches[0].clientX; });
+canvas.addEventListener('touchend', e=>{
+  if(!touchStartX) return;
+  let dx = e.changedTouches[0].clientX - touchStartX;
+  if(dx<-20) moveLane(player.lane-1);
+  if(dx>20) moveLane(player.lane+1);
+  touchStartX=null;
+});
+
+// perspective transform
+function project(lane, z){
+  let perspective = 300/(z+1);
+  let laneCenter = (lane-(lanes-1)/2) * 100 * perspective + canvas.width/2 - 25*perspective;
+  let size = 50*perspective;
+  return { x: laneCenter, size };
+}
+
+function moveLane(lane){
+  player.lane = Math.max(0, Math.min(lanes-1,lane));
+}
+
+// spawn new block at z=1
+function spawnBlock(){
+  blocks.push({
+    lane: Math.floor(Math.random()*lanes),
+    color: colors[Math.floor(Math.random()*colors.length)],
+    z:1
+  });
+}
+
+// collision check
+function checkCollision(p, b){
+  return b.z<0.05 && b.lane===p.lane;
+}
+
+// particles
+function createParticles(x,y,color){
+  for(let i=0;i<12;i++){
+    particles.push({x,y,vx:(Math.random()-0.5)*4,vy:(Math.random()-0.5)*4,life:30,color});
+  }
+}
+
+// draw text
+function drawCenteredText(text,size,y){
+  ctx.fillStyle='white';
+  ctx.font=`${size}px Arial`;
+  const width = ctx.measureText(text).width;
+  ctx.fillText(text,(canvas.width-width)/2,y);
+}
+
+function update(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  if(!gameStarted){
+    drawCenteredText('Cluster Rush 3D',40,200);
+    drawCenteredText('Press Space to Start',25,300);
+    requestAnimationFrame(update);
+    return;
+  }
+
+  if(gameOver){
+    drawCenteredText('Game Over!',40,250);
+    drawCenteredText('Score: '+score,30,320);
+    drawCenteredText('Press F5 to Restart',20,400);
+    return;
+  }
+
+  frameCount++;
+  if(frameCount%spawnInterval===0) spawnBlock();
+
+  // draw lane lines for depth
+  for(let l=0;l<lanes;l++){
+    ctx.strokeStyle='#333';
+    ctx.beginPath();
+    ctx.moveTo(canvas.width/2 + (l-(lanes-1)/2)*100, canvas.height);
+    ctx.lineTo(canvas.width/2 + (l-(lanes-1)/2)*100,0);
+    ctx.stroke();
+  }
+
+  // move and draw blocks
+  for(let i=blocks.length-1;i>=0;i--){
+    let b = blocks[i];
+    b.z -= speed;
+    let p = project(b.lane,b.z);
+    if(p.size<=0){ blocks.splice(i,1); continue; }
+    ctx.fillStyle=b.color;
+    ctx.fillRect(p.x,canvas.height/2 - p.size/2 + 150, p.size, p.size);
+
+    if(checkCollision(player,b)){
+      if(player.color!==b.color){ gameOver=true; }
+      else{ score++; blocks.splice(i,1); }
     }
+  }
 
-    function spawnBlock() {
-      if (!gameStarted || gameOver) return;
-      blocks.push({
-        lane: Math.floor(Math.random() * lanes),
-        color: colors[Math.floor(Math.random() * colors.length)],
-        y: -50
-      });
-    }
+  // draw player
+  let playerProjected = project(player.lane,0);
+  ctx.fillStyle=player.color;
+  ctx.fillRect(playerProjected.x,canvas.height-50,playerProjected.size,playerProjected.size);
 
-    function checkCollision(a, b) {
-      return a.lane === b.lane && b.y + 50 >= canvas.height - 50;
-    }
+  // draw score
+  ctx.fillStyle='white';
+  ctx.font='20px Arial';
+  ctx.fillText('Score: '+score,10,30);
 
-    function createParticles(x, y, color) {
-      for (let i = 0; i < 12; i++) {
-        particles.push({
-          x: x + 25, y: y + 25,
-          vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4,
-          life: 30, color: color
-        });
-      }
-    }
+  requestAnimationFrame(update);
+}
 
-    function drawCenteredText(text, size, y) {
-      ctx.fillStyle = 'white';
-      ctx.font = `${size}px Arial`;
-      const width = ctx.measureText(text).width;
-      ctx.fillText(text, (canvas.width - width) / 2, y);
-    }
-
-    function update() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (!gameStarted) {
-        drawCenteredText('Cluster Rush', 40, 200);
-        drawCenteredText('Press Space to Start', 25, 300);
-        requestAnimationFrame(update);
-        return;
-      }
-
-      if (gameOver) {
-        drawCenteredText('Game Over!', 40, 250);
-        drawCenteredText('Score: ' + score, 30, 320);
-        drawCenteredText('Press F5 to Restart', 20, 400);
-        return;
-      }
-
-      player.x += (player.targetX - player.x) * 0.2;
-      ctx.fillStyle = player.color;
-      ctx.fillRect(player.x, canvas.height - 50, player.w, player.h);
-
-      for (let i = blocks.length - 1; i >= 0; i--) {
-        let b = blocks[i];
-        b.y += speed;
-        ctx.fillStyle = b.color;
-        ctx.fillRect(b.lane * laneWidth + (laneWidth - 50) / 2, b.y, 50, 50);
-
-        if (checkCollision(player, b)) {
-          if (player.color !== b.color) {
-            gameOver = true;
-          } else {
-            createParticles(b.lane * laneWidth, b.y, b.color);
-            blocks.splice(i, 1);
-            score++;
-            if (score % 5 === 0) speed += 0.5;
-          }
-        } else if (b.y > canvas.height) {
-          blocks.splice(i, 1);
-        }
-      }
-
-      for (let i = particles.length - 1; i >= 0; i--) {
-        let p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life--;
-        ctx.fillStyle = p.color;
-        ctx.fillRect(p.x, p.y, 4, 4);
-        if (p.life <= 0) particles.splice(i, 1);
-      }
-
-      ctx.fillStyle = 'white';
-      ctx.font = '20px Arial';
-      ctx.fillText('Score: ' + score, 10, 30);
-
-      requestAnimationFrame(update);
-    }
-
-    setInterval(() => {
-      if (gameStarted && !gameOver) player.color = colors[Math.floor(Math.random() * colors.length)];
-    }, 3000);
-
-    setInterval(spawnBlock, spawnInterval);
-
-    update();
-  </script>
+update();
+</script>
 </body>
 </html>
