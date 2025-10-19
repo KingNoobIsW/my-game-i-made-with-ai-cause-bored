@@ -2,20 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Cluster Rush 3D</title>
+<title>Cluster Rush Standalone</title>
 <style>
   body { margin:0; overflow:hidden; background:#111; }
-  canvas { display:block; margin:0 auto; background:#111; }
+  canvas { display:block; margin:0 auto; background:#111; touch-action: none; }
 </style>
 </head>
 <body>
 <canvas id="gameCanvas" width="400" height="600"></canvas>
 <script>
+// Canvas setup
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// Game settings
 const lanes = 4;
-const laneWidth = 1; // used only for relative positions
 const colors = ['#FF3F3F','#3FFF3F','#3F3FFF','#FFF33F'];
 let speed = 0.02; // speed along z-axis
 let spawnInterval = 60; // frames
@@ -23,13 +24,12 @@ let score = 0;
 let gameOver = false;
 let gameStarted = false;
 
-// player in lane
-let player = { lane: 1, color: colors[Math.floor(Math.random()*colors.length)], x:0, targetX:0, z:0 };
+// Player
+let player = { lane: 1, color: colors[Math.floor(Math.random()*colors.length)], targetLane:1 };
 
-// blocks
+// Blocks and particles
 let blocks = [];
 let particles = [];
-
 let frameCount = 0;
 
 // Input
@@ -41,6 +41,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
+// Touch input
 let touchStartX = null;
 canvas.addEventListener('touchstart', e=>{ touchStartX=e.touches[0].clientX; });
 canvas.addEventListener('touchend', e=>{
@@ -51,7 +52,11 @@ canvas.addEventListener('touchend', e=>{
   touchStartX=null;
 });
 
-// perspective transform
+function moveLane(lane){
+  player.targetLane = Math.max(0, Math.min(lanes-1,lane));
+}
+
+// Perspective projection
 function project(lane, z){
   let perspective = 300/(z+1);
   let laneCenter = (lane-(lanes-1)/2) * 100 * perspective + canvas.width/2 - 25*perspective;
@@ -59,11 +64,7 @@ function project(lane, z){
   return { x: laneCenter, size };
 }
 
-function moveLane(lane){
-  player.lane = Math.max(0, Math.min(lanes-1,lane));
-}
-
-// spawn new block at z=1
+// Spawn block
 function spawnBlock(){
   blocks.push({
     lane: Math.floor(Math.random()*lanes),
@@ -72,19 +73,19 @@ function spawnBlock(){
   });
 }
 
-// collision check
+// Collision check
 function checkCollision(p, b){
   return b.z<0.05 && b.lane===p.lane;
 }
 
-// particles
+// Particles
 function createParticles(x,y,color){
   for(let i=0;i<12;i++){
     particles.push({x,y,vx:(Math.random()-0.5)*4,vy:(Math.random()-0.5)*4,life:30,color});
   }
 }
 
-// draw text
+// Draw centered text
 function drawCenteredText(text,size,y){
   ctx.fillStyle='white';
   ctx.font=`${size}px Arial`;
@@ -92,11 +93,12 @@ function drawCenteredText(text,size,y){
   ctx.fillText(text,(canvas.width-width)/2,y);
 }
 
+// Game loop
 function update(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
   if(!gameStarted){
-    drawCenteredText('Cluster Rush 3D',40,200);
+    drawCenteredText('Cluster Rush',40,200);
     drawCenteredText('Press Space to Start',25,300);
     requestAnimationFrame(update);
     return;
@@ -112,7 +114,13 @@ function update(){
   frameCount++;
   if(frameCount%spawnInterval===0) spawnBlock();
 
-  // draw lane lines for depth
+  // Smooth player movement
+  if(player.lane!==player.targetLane){
+    if(player.lane<player.targetLane) player.lane += 0.1;
+    else player.lane -=0.1;
+  }
+
+  // Draw lane lines
   for(let l=0;l<lanes;l++){
     ctx.strokeStyle='#333';
     ctx.beginPath();
@@ -121,33 +129,45 @@ function update(){
     ctx.stroke();
   }
 
-  // move and draw blocks
+  // Move & draw blocks
   for(let i=blocks.length-1;i>=0;i--){
-    let b = blocks[i];
+    let b=blocks[i];
     b.z -= speed;
-    let p = project(b.lane,b.z);
+    let p = project(Math.round(b.lane),b.z);
     if(p.size<=0){ blocks.splice(i,1); continue; }
     ctx.fillStyle=b.color;
     ctx.fillRect(p.x,canvas.height/2 - p.size/2 + 150, p.size, p.size);
 
     if(checkCollision(player,b)){
       if(player.color!==b.color){ gameOver=true; }
-      else{ score++; blocks.splice(i,1); }
+      else{ score++; blocks.splice(i,1); createParticles(p.x+25, canvas.height-25,b.color); if(score%5===0) speed+=0.005;}
     }
   }
 
-  // draw player
-  let playerProjected = project(player.lane,0);
-  ctx.fillStyle=player.color;
-  ctx.fillRect(playerProjected.x,canvas.height-50,playerProjected.size,playerProjected.size);
+  // Draw particles
+  for(let i=particles.length-1;i>=0;i--){
+    let p=particles[i];
+    p.x+=p.vx; p.y+=p.vy; p.life--;
+    ctx.fillStyle=p.color;
+    ctx.fillRect(p.x,p.y,4,4);
+    if(p.life<=0) particles.splice(i,1);
+  }
 
-  // draw score
+  // Draw player
+  let playerProj = project(Math.round(player.lane),0);
+  ctx.fillStyle=player.color;
+  ctx.fillRect(playerProj.x,canvas.height-50,playerProj.size,playerProj.size);
+
+  // Draw score
   ctx.fillStyle='white';
   ctx.font='20px Arial';
   ctx.fillText('Score: '+score,10,30);
 
   requestAnimationFrame(update);
 }
+
+// Change player color every 3 seconds
+setInterval(()=>{ if(gameStarted && !gameOver) player.color = colors[Math.floor(Math.random()*colors.length)]; },3000);
 
 update();
 </script>
