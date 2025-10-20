@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Cluster Rush + Web Osu Mania Menu</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+    canvas, iframe {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      touch-action: none;
+    }
+    #menuBtn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    #menu {
+      position: absolute;
+      top: 45px;
+      left: 10px;
+      z-index: 10;
+      background: #222;
+      border: 1px solid #555;
+      border-radius: 6px;
+      padding: 10px;
+      display: none;
+    }
+    #menu input {
+      width: 220px;
+      padding: 4px;
+      border-radius: 4px;
+      border: 1px solid #555;
+      background: #111;
+      color: #fff;
+    }
+    #menu button {
+      margin-top: 6px;
+      background: #0f0;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+    }
+    #clusterRushContainer, #osuContainer {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+  <link href="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/TemplateData/style.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/TemplateData/UnityProgress.js"></script>
+</head>
+<body class="template">
+
+  <!-- --- MENU BUTTON + DROPDOWN --- -->
+  <button id="menuBtn">☰ Menu</button>
+  <div id="menu">
+    <label>Redirect link:</label><br>
+    <input type="text" id="linkInput" placeholder="https://example.com"><br>
+    <button id="saveBtn">Save Link</button>
+    <hr>
+    <button id="osuBtn">🎵 Play Web Osu Mania</button>
+    <button id="clusterBtn">🦖 Play Cluster Rush</button>
+  </div>
+
+  <!-- --- GAME CONTAINERS --- -->
+  <div id="clusterRushContainer" class="template-wrap clear">
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+  </div>
+
+  <div id="osuContainer" style="display:none;">
+    <!-- Updated to use GitHub Pages URL for Web Osu Mania -->
+    <iframe id="osuFrame" src="https://bubbls.github.io/webosu/"></iframe>
+  </div>
+
+  <script>
+    // --- Load Cluster Rush Unity build ---
+    var Module = {
+      TOTAL_MEMORY: 268435456,
+      backgroundColor: "#222C36",
+      splashStyle: "Dark",
+      dataUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.data",
+      codeUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.js",
+      asmUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.asm.js",
+      memUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.mem",
+    };
+    const unityScript = document.createElement("script");
+    unityScript.src = "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/UnityLoader.js";
+    document.body.appendChild(unityScript);
+
+    // --- MENU LOGIC ---
+    const menuBtn = document.getElementById("menuBtn");
+    const menu = document.getElementById("menu");
+    const linkInput = document.getElementById("linkInput");
+    const saveBtn = document.getElementById("saveBtn");
+    const osuBtn = document.getElementById("osuBtn");
+    const clusterBtn = document.getElementById("clusterBtn");
+
+    // load saved link
+    linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
+
+    menuBtn.onclick = () => {
+      menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
+    };
+
+    saveBtn.onclick = () => {
+      const link = linkInput.value.trim();
+      if (link) {
+        localStorage.setItem("redirectLink", link);
+        alert("Link saved! Press '>' to go there.");
+        menu.style.display = "none";
+      }
+    };
+
+    // --- Switching between games ---
+    const clusterRushContainer = document.getElementById("clusterRushContainer");
+    const osuContainer = document.getElementById("osuContainer");
+
+    osuBtn.onclick = () => {
+      clusterRushContainer.style.display = "none";
+      osuContainer.style.display = "block";
+      menu.style.display = "none";
+    };
+
+    clusterBtn.onclick = () => {
+      osuContainer.style.display = "none";
+      clusterRushContainer.style.display = "block";
+      menu.style.display = "none";
+    };
+
+    // --- Redirect key ---
+    document.addEventListener("keydown", function(event) {
+      if (event.key === ">") {
+        const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
+        window.location.href = link;
+      }
+    });
+  </script>
+</body>
+</html>
