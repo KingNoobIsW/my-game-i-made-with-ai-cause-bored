@@ -1,127 +1,271 @@
 <!DOCTYPE html>
-<html lang="en-us">
-<base href="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/">
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Cluster Rush (Custom Redirect Key)</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Portal</title>
   <style>
-    body {
+    * {
       margin: 0;
-      background: #111;
-      overflow: hidden;
-      font-family: sans-serif;
+      padding: 0;
+      box-sizing: border-box;
     }
-    canvas {
-      display: block;
-      width: 100vw;
-      height: 100vh;
-      touch-action: none;
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
     }
+
     #menuBtn {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 10;
-      background: #333;
-      color: #fff;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      color: #1e3c72;
       border: none;
-      border-radius: 6px;
-      padding: 6px 10px;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 18px;
+      font-weight: 600;
       cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
     }
+
+    #menuBtn:hover {
+      background: white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
     #menu {
-      position: absolute;
-      top: 45px;
-      left: 10px;
-      z-index: 10;
-      background: #222;
-      border: 1px solid #555;
-      border-radius: 6px;
-      padding: 10px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 999;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #menu.show {
+      display: flex;
+    }
+
+    .menu-content {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .menu-section {
+      margin-bottom: 28px;
+    }
+
+    .menu-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .menu-section h2 {
+      color: #1e3c72;
+      font-size: 18px;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .menu-section label {
+      display: block;
+      color: #555;
+      font-size: 14px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .menu-section input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .menu-section input:focus {
+      outline: none;
+      border-color: #2a5298;
+    }
+
+    .game-item {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .game-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #saveBtn {
+      background: #4caf50;
+      color: white;
+    }
+
+    #saveBtn:hover {
+      background: #45a049;
+    }
+
+    #closeBtn {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    #closeBtn:hover {
+      background: #d0d0d0;
+    }
+
+    #gameFrame {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      z-index: 998;
       display: none;
     }
-    #menu label {
-      color: #fff;
+
+    #gameFrame.show {
+      display: block;
     }
-    #menu input {
-      width: 220px;
-      padding: 4px;
-      border-radius: 4px;
-      border: 1px solid #555;
-      background: #111;
-      color: #fff;
-    }
-    #menu button {
-      margin-top: 6px;
-      background: #007BFF; /* blue */
-      color: #fff;          /* white text */
-      border: none;
-      padding: 5px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    #menu button:hover {
-      background: #3399ff; /* lighter blue on hover */
+
+    .info-text {
+      color: #666;
+      font-size: 12px;
+      margin-top: 8px;
+      font-style: italic;
     }
   </style>
-  <link href="TemplateData/style.css" rel="stylesheet">
-  <script src="TemplateData/UnityProgress.js"></script>
 </head>
-<body class="template">
+<body>
   <button id="menuBtn">☰ Menu</button>
+
   <div id="menu">
-    <label>Redirect link:</label><br>
-    <input type="text" id="linkInput" placeholder="https://example.com"><br>
-    <button id="saveBtn">Save</button>
+    <div class="menu-content">
+      <div class="menu-section">
+        <h2>Quick Redirect</h2>
+        <label>Redirect URL (press '&gt;' key):</label>
+        <input type="text" id="linkInput" placeholder="https://classroom.google.com/h">
+        <p class="info-text">This URL will open when you press the '&gt;' key</p>
+      </div>
+
+      <div class="menu-section">
+        <h2>Available Games</h2>
+        <div class="game-item" id="gameBtn">
+          RE_RUN
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button id="saveBtn">Save Settings</button>
+        <button id="closeBtn">Close</button>
+      </div>
+    </div>
   </div>
 
-  <div class="template-wrap clear" id="game-container">
-    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-  </div>
+  <iframe id="gameFrame" src=""></iframe>
 
   <script>
-    // Load the Unity WebGL game
-    var Module = {
-      TOTAL_MEMORY: 268435456,
-      backgroundColor: "#222C36",
-      splashStyle: "Dark",
-      dataUrl: "Release/NG.data",
-      codeUrl: "Release/NG.js",
-      asmUrl: "Release/NG.asm.js",
-      memUrl: "Release/NG.mem",
-    };
-    const script = document.createElement("script");
-    script.src = "Release/UnityLoader.js";
-    document.body.appendChild(script);
-
-    // --- Menu logic ---
     const menuBtn = document.getElementById("menuBtn");
     const menu = document.getElementById("menu");
     const linkInput = document.getElementById("linkInput");
     const saveBtn = document.getElementById("saveBtn");
+    const closeBtn = document.getElementById("closeBtn");
+    const gameBtn = document.getElementById("gameBtn");
+    const gameFrame = document.getElementById("gameFrame");
 
-    // Load saved link or default
+    // Load saved redirect link
     linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
 
+    // Toggle menu
     menuBtn.onclick = () => {
-      menu.style.display = menu.style.display === "none" ? "block" : "none";
+      menu.classList.toggle("show");
     };
 
+    // Close menu
+    closeBtn.onclick = () => {
+      menu.classList.remove("show");
+    };
+
+    // Close menu when clicking outside
+    menu.onclick = (e) => {
+      if (e.target === menu) {
+        menu.classList.remove("show");
+      }
+    };
+
+    // Save redirect link
     saveBtn.onclick = () => {
       const link = linkInput.value.trim();
       if (link) {
         localStorage.setItem("redirectLink", link);
-        alert("✅ Link saved! Press '>' to go there.");
-        menu.style.display = "none";
+        alert("Settings saved!");
       }
     };
 
-    // --- Key handler ---
-    document.addEventListener("keydown", function(event) {
+    // Launch game
+    gameBtn.onclick = () => {
+      gameFrame.src = "games/RE_RUN.html";
+      gameFrame.classList.add("show");
+      menu.classList.remove("show");
+    };
+
+    // Quick redirect key handler
+    document.addEventListener("keydown", (event) => {
       if (event.key === ">") {
         const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
         window.location.href = link;
+      }
+      // Press Escape to exit game
+      if (event.key === "Escape" && gameFrame.classList.contains("show")) {
+        gameFrame.classList.remove("show");
+        gameFrame.src = "";
       }
     });
   </script>
