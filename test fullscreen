@@ -122,4 +122,48 @@
     const menu = document.getElementById("menu");
     const linkInput = document.getElementById("linkInput");
     const saveBtn = document.getElementById("saveBtn");
-    const osuBtn = document.getElement
+    const osuBtn = document.getElementById("osuBtn");
+    const clusterBtn = document.getElementById("clusterBtn");
+
+    // load saved link
+    linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
+
+    menuBtn.onclick = () => {
+      menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
+    };
+
+    saveBtn.onclick = () => {
+      const link = linkInput.value.trim();
+      if (link) {
+        localStorage.setItem("redirectLink", link);
+        alert("Link saved! Press '>' to go there.");
+        menu.style.display = "none";
+      }
+    };
+
+    // --- Switching between games ---
+    const clusterRushContainer = document.getElementById("clusterRushContainer");
+    const osuContainer = document.getElementById("osuContainer");
+
+    osuBtn.onclick = () => {
+      clusterRushContainer.style.display = "none";
+      osuContainer.style.display = "block";
+      menu.style.display = "none";
+    };
+
+    clusterBtn.onclick = () => {
+      osuContainer.style.display = "none";
+      clusterRushContainer.style.display = "block";
+      menu.style.display = "none";
+    };
+
+    // --- Redirect key ---
+    document.addEventListener("keydown", function(event) {
+      if (event.key === ">") {
+        const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
+        window.location.href = link;
+      }
+    });
+  </script>
+</body>
+</html>
