@@ -5,6 +5,10 @@
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>Cluster Rush (Custom Redirect Key)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="TemplateData/favicon.ico">
   <style>
     body {
       margin: 0;
@@ -117,6 +121,13 @@
         window.location.href = link;
       }
     });
+
+    // --- PWA Service Worker Register ---
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
   </script>
 </body>
 </html>
