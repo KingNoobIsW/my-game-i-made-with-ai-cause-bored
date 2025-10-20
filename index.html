@@ -220,27 +220,22 @@
     const gameBtn = document.getElementById("gameBtn");
     const gameFrame = document.getElementById("gameFrame");
 
-    // Load saved redirect link
     linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
 
-    // Toggle menu
     menuBtn.onclick = () => {
       menu.classList.toggle("show");
     };
 
-    // Close menu
     closeBtn.onclick = () => {
       menu.classList.remove("show");
     };
 
-    // Close menu when clicking outside
     menu.onclick = (e) => {
       if (e.target === menu) {
         menu.classList.remove("show");
       }
     };
 
-    // Save redirect link
     saveBtn.onclick = () => {
       const link = linkInput.value.trim();
       if (link) {
@@ -249,20 +244,17 @@
       }
     };
 
-    // Launch game
     gameBtn.onclick = () => {
       gameFrame.src = "games/RE_RUN.html";
       gameFrame.classList.add("show");
       menu.classList.remove("show");
     };
 
-    // Quick redirect key handler
     document.addEventListener("keydown", (event) => {
       if (event.key === ">") {
         const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
         window.location.href = link;
       }
-      // Press Escape to exit game
       if (event.key === "Escape" && gameFrame.classList.contains("show")) {
         gameFrame.classList.remove("show");
         gameFrame.src = "";
