@@ -76,7 +76,7 @@
   <!-- --- MENU + FULLSCREEN BUTTONS --- -->
   <div id="topButtons">
     <button id="menuBtn">☰ Menu</button>
-    <button id="fullscreenBtn" onclick="window.open('https://hectickiwi.github.io/Web-Osu-Mania/', '_blank')">🔳 Fullscreen</button>
+    <button id="fullscreenBtn">🔳 Fullscreen</button>
   </div>
 
   <!-- --- MENU DROPDOWN --- -->
@@ -120,6 +120,10 @@
     const saveBtn = document.getElementById("saveBtn");
     const osuBtn = document.getElementById("osuBtn");
     const clusterBtn = document.getElementById("clusterBtn");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+
+    const clusterRushContainer = document.getElementById("clusterRushContainer");
+    const osuContainer = document.getElementById("osuContainer");
 
     // load saved link
     linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
@@ -138,9 +142,6 @@
     };
 
     // --- Switching between games ---
-    const clusterRushContainer = document.getElementById("clusterRushContainer");
-    const osuContainer = document.getElementById("osuContainer");
-
     osuBtn.onclick = () => {
       clusterRushContainer.style.display = "none";
       osuContainer.style.display = "block";
@@ -151,6 +152,15 @@
       osuContainer.style.display = "none";
       clusterRushContainer.style.display = "block";
       menu.style.display = "none";
+    };
+
+    // --- Fullscreen button logic ---
+    fullscreenBtn.onclick = () => {
+      const isOsuVisible = osuContainer.style.display === "block";
+      const url = isOsuVisible
+        ? "https://hectickiwi.github.io/Web-Osu-Mania/"
+        : "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/index.html";
+      window.open(url, "_blank");
     };
 
     // --- Redirect key ---
