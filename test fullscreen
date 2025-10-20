@@ -18,17 +18,22 @@
       border: none;
       touch-action: none;
     }
-    #menuBtn {
+    #topButtons {
       position: absolute;
       top: 10px;
       left: 10px;
       z-index: 10;
+      display: flex;
+      gap: 10px;
+    }
+    #topButtons button {
       background: #333;
       color: #fff;
       border: none;
       border-radius: 6px;
       padding: 6px 10px;
       cursor: pointer;
+      font-weight: bold;
     }
     #menu {
       position: absolute;
@@ -62,27 +67,19 @@
       width: 100vw;
       height: 100vh;
     }
-    #fullscreenBtn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 10;
-      background: #0f0;
-      color: #000;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 10px;
-      cursor: pointer;
-      font-weight: bold;
-    }
   </style>
   <link href="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/TemplateData/style.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/TemplateData/UnityProgress.js"></script>
 </head>
 <body class="template">
 
-  <!-- --- MENU BUTTON + DROPDOWN --- -->
-  <button id="menuBtn">☰ Menu</button>
+  <!-- --- MENU + FULLSCREEN BUTTONS --- -->
+  <div id="topButtons">
+    <button id="menuBtn">☰ Menu</button>
+    <button id="fullscreenBtn" onclick="window.open('https://hectickiwi.github.io/Web-Osu-Mania/', '_blank')">🔳 Fullscreen</button>
+  </div>
+
+  <!-- --- MENU DROPDOWN --- -->
   <div id="menu">
     <label>Redirect link:</label><br>
     <input type="text" id="linkInput" placeholder="https://example.com"><br>
@@ -99,7 +96,6 @@
 
   <div id="osuContainer" style="display:none;">
     <iframe id="osuFrame" src="https://hectickiwi.github.io/Web-Osu-Mania/" allow="fullscreen" allowfullscreen></iframe>
-    <button id="fullscreenBtn" onclick="window.open('https://hectickiwi.github.io/Web-Osu-Mania/', '_blank')">🔳 Fullscreen</button>
   </div>
 
   <script>
