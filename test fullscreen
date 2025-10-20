@@ -73,10 +73,10 @@
 </head>
 <body class="template">
 
-  <!-- --- MENU + FULLSCREEN BUTTONS --- -->
+  <!-- --- MENU + NEW TAB BUTTONS --- -->
   <div id="topButtons">
     <button id="menuBtn">☰ Menu</button>
-    <button id="fullscreenBtn">🔳 Fullscreen</button>
+    <button id="newTabBtn">↗ Open in New Tab</button>
   </div>
 
   <!-- --- MENU DROPDOWN --- -->
@@ -120,7 +120,7 @@
     const saveBtn = document.getElementById("saveBtn");
     const osuBtn = document.getElementById("osuBtn");
     const clusterBtn = document.getElementById("clusterBtn");
-    const fullscreenBtn = document.getElementById("fullscreenBtn");
+    const newTabBtn = document.getElementById("newTabBtn");
 
     const clusterRushContainer = document.getElementById("clusterRushContainer");
     const osuContainer = document.getElementById("osuContainer");
@@ -154,13 +154,13 @@
       menu.style.display = "none";
     };
 
-    // --- Fullscreen button logic ---
-    fullscreenBtn.onclick = () => {
+    // --- Open in New Tab button logic ---
+    newTabBtn.onclick = () => {
       const isOsuVisible = osuContainer.style.display === "block";
       const url = isOsuVisible
         ? "https://hectickiwi.github.io/Web-Osu-Mania/"
         : "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/index.html";
-      window.open(url, "_blank");
+      window.open(url, "_blank", "width=1024,height=768");
     };
 
     // --- Redirect key ---
