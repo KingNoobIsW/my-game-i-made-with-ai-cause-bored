@@ -28,17 +28,17 @@
       height: 100%;
       border: none;
       z-index: 1;
-      pointer-events: auto; /* allow game clicks */
+      pointer-events: auto; /* game receives clicks where menu isn’t */
     }
 
     #topButtons {
       position: absolute;
       top: 10px;
       left: 10px;
-      z-index: 10; /* above iframe */
+      z-index: 10;
       display: flex;
       gap: 10px;
-      pointer-events: auto; /* allow clicking */
+      pointer-events: auto;
     }
 
     #topButtons button {
@@ -53,15 +53,16 @@
 
     #menu {
       position: absolute;
-      top: 45px;
+      top: 60px;
       left: 10px;
-      z-index: 11; /* above buttons and iframe */
-      background: #222;
+      z-index: 11;
+      background: rgba(34, 34, 34, 0.85); /* semi-transparent */
       border: 1px solid #555;
       border-radius: 6px;
       padding: 10px;
       display: none;
-      pointer-events: auto; /* fully clickable */
+      pointer-events: auto;
+      cursor: move; /* draggable hint */
     }
 
     #menu input {
@@ -92,7 +93,7 @@
     <button id="newTabBtn">↗ Open in New Tab</button>
   </div>
 
-  <!-- --- MENU DROPDOWN --- -->
+  <!-- --- DRAGGABLE MENU --- -->
   <div id="menu">
     <label>Redirect link:</label><br>
     <input type="text" id="linkInput" placeholder="https://example.com"><br>
@@ -168,6 +169,37 @@
         const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
         window.location.href = link;
       }
+    });
+
+    // --- Draggable menu ---
+    let isDragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    menu.addEventListener('mousedown', function(e) {
+      isDragging = true;
+      offsetX = e.clientX - menu.offsetLeft;
+      offsetY = e.clientY - menu.offsetTop;
+      menu.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', function(e) {
+      if (isDragging) {
+        let left = e.clientX - offsetX;
+        let top = e.clientY - offsetY;
+
+        // Keep menu inside viewport
+        left = Math.max(0, Math.min(left, window.innerWidth - menu.offsetWidth));
+        top = Math.max(0, Math.min(top, window.innerHeight - menu.offsetHeight));
+
+        menu.style.left = left + 'px';
+        menu.style.top = top + 'px';
+      }
+    });
+
+    document.addEventListener('mouseup', function() {
+      isDragging = false;
+      menu.style.cursor = 'move';
     });
   </script>
 
