@@ -5,12 +5,15 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>Cluster Rush + Web Osu Mania Menu</title>
   <style>
-    body {
+    html, body {
       margin: 0;
-      background: #111;
+      padding: 0;
       overflow: hidden;
+      height: 100%;
+      background: #111;
       font-family: sans-serif;
     }
+
     canvas, iframe {
       display: block;
       width: 100vw;
@@ -18,6 +21,7 @@
       border: none;
       touch-action: none;
     }
+
     #topButtons {
       position: absolute;
       top: 10px;
@@ -26,6 +30,7 @@
       display: flex;
       gap: 10px;
     }
+
     #topButtons button {
       background: #333;
       color: #fff;
@@ -35,6 +40,7 @@
       cursor: pointer;
       font-weight: bold;
     }
+
     #menu {
       position: absolute;
       top: 45px;
@@ -46,6 +52,7 @@
       padding: 10px;
       display: none;
     }
+
     #menu input {
       width: 220px;
       padding: 4px;
@@ -54,6 +61,7 @@
       background: #111;
       color: #fff;
     }
+
     #menu button {
       margin-top: 6px;
       background: #0f0;
@@ -63,6 +71,7 @@
       cursor: pointer;
       width: 100%;
     }
+
     #clusterRushContainer, #osuContainer {
       width: 100vw;
       height: 100vh;
@@ -95,7 +104,7 @@
   </div>
 
   <div id="osuContainer" style="display:none;">
-    <iframe id="osuFrame" src="https://hectickiwi.github.io/Web-Osu-Mania/" allow="fullscreen" allowfullscreen></iframe>
+    <iframe id="osuFrame" src="https://hectickiwi.github.io/Web-Osu-Mania/" allowfullscreen></iframe>
   </div>
 
   <script>
@@ -157,9 +166,9 @@
     // --- Open in New Tab button ---
     newTabBtn.onclick = () => {
       const isOsuVisible = osuContainer.style.display === "block";
-const url = isOsuVisible
-  ? "https://hectickiwi.github.io/Web-Osu-Mania/"
-  : "https://KingNoobIsW.github.io/ClusterRush/"; // ✅ fixed to real playable site
+      const url = isOsuVisible
+        ? "https://hectickiwi.github.io/Web-Osu-Mania/"
+        : "https://KingNoobIsW.github.io/ClusterRush/";
       const newWin = window.open(url, "_blank", "width=1024,height=768");
       if (!newWin) window.location.href = url; // fallback if popup blocked
     };
