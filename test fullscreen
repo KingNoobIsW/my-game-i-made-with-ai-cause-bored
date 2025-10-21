@@ -22,6 +22,7 @@
       padding: 20px;
       min-width: 300px;
       text-align: center;
+      cursor: move;
     }
 
     #menu input {
@@ -60,6 +61,7 @@
   </div>
 
   <script>
+    const menu = document.getElementById("menu");
     const linkInput = document.getElementById("linkInput");
     const saveBtn = document.getElementById("saveBtn");
     const osuBtn = document.getElementById("osuBtn");
@@ -78,6 +80,7 @@
     };
 
     osuBtn.onclick = () => {
+      // ✅ Updated to new WebOsuMania site
       window.open("https://kingnoobisw.github.io/WebOsuMania/", "_blank");
     };
 
@@ -96,6 +99,49 @@
         const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
         window.open(link, "_blank");
       }
+    });
+
+    // --- Draggable menu ---
+    let isDragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    menu.addEventListener('mousedown', function(e) {
+      isDragging = true;
+      offsetX = e.clientX - menu.offsetLeft;
+      offsetY = e.clientY - menu.offsetTop;
+      menu.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', function(e) {
+      if (!isDragging) return;
+
+      let left = e.clientX - offsetX;
+      let top = e.clientY - offsetY;
+
+      // Keep inside viewport
+      left = Math.max(0, Math.min(left, window.innerWidth - menu.offsetWidth));
+      top = Math.max(0, Math.min(top, window.innerHeight - menu.offsetHeight));
+
+      menu.style.left = left + 'px';
+      menu.style.top = top + 'px';
+    });
+
+    document.addEventListener('mouseup', function() {
+      if (!isDragging) return;
+      isDragging = false;
+      menu.style.cursor = 'move';
+
+      // Snap to nearest edge
+      const menuRect = menu.getBoundingClientRect();
+      const middleX = window.innerWidth / 2;
+      const middleY = window.innerHeight / 2;
+
+      let snapLeft = (menuRect.left + menuRect.width / 2 < middleX) ? 10 : window.innerWidth - menu.offsetWidth - 10;
+      let snapTop = (menuRect.top + menuRect.height / 2 < middleY) ? 10 : window.innerHeight - menu.offsetHeight - 10;
+
+      menu.style.left = snapLeft + 'px';
+      menu.style.top = snapTop + 'px';
     });
   </script>
 
