@@ -80,7 +80,7 @@
     };
 
     osuBtn.onclick = () => {
-      // ✅ Updated to new WebOsuMania site
+      // ✅ Updated to your new WebOsuMania site
       window.open("https://kingnoobisw.github.io/WebOsuMania/", "_blank");
     };
 
