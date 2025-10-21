@@ -17,7 +17,7 @@
       position: absolute;
       top: 10px;
       left: 10px;
-      background: rgba(34, 34, 34, 0.9);
+      background: rgba(34, 34, 34, 0.85);
       border: 1px solid #555;
       border-radius: 8px;
       padding: 20px;
@@ -95,7 +95,7 @@
       }
     };
 
-    // Load games in iframe
+    // Load games in iframe (no new tabs)
     osuBtn.onclick = () => {
       gameFrame.src = "https://hectickiwi.github.io/Web-Osu-Mania/?v=" + new Date().getTime();
     };
@@ -151,6 +151,7 @@
       isDragging = false;
       menu.style.cursor = 'move';
 
+      // Snap to nearest edge
       const menuRect = menu.getBoundingClientRect();
       const middleX = window.innerWidth / 2;
       const middleY = window.innerHeight / 2;
