@@ -14,19 +14,18 @@
       font-family: sans-serif;
     }
 
-    canvas, iframe {
+    iframe {
       display: block;
       width: 100vw;
       height: 100vh;
       border: none;
-      touch-action: none;
     }
 
     #topButtons {
       position: absolute;
       top: 10px;
       left: 10px;
-      z-index: 20; /* keep on top of canvas */
+      z-index: 20;
       display: flex;
       gap: 10px;
     }
@@ -45,7 +44,7 @@
       position: absolute;
       top: 45px;
       left: 10px;
-      z-index: 25; /* above topButtons */
+      z-index: 25;
       background: #222;
       border: 1px solid #555;
       border-radius: 6px;
@@ -77,10 +76,8 @@
       height: 100vh;
     }
   </style>
-  <link href="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/TemplateData/style.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/TemplateData/UnityProgress.js"></script>
 </head>
-<body class="template">
+<body>
 
   <!-- --- MENU + NEW TAB BUTTONS --- -->
   <div id="topButtons">
@@ -99,29 +96,15 @@
   </div>
 
   <!-- --- GAME CONTAINERS --- -->
-  <div id="clusterRushContainer" class="template-wrap clear">
-    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+  <div id="clusterRushContainer">
+    <iframe src="https://swordslasher.com/games/cluster-rush/game.html" allowfullscreen></iframe>
   </div>
 
   <div id="osuContainer" style="display:none;">
-    <iframe id="osuFrame" src="https://hectickiwi.github.io/Web-Osu-Mania/" allowfullscreen></iframe>
+    <iframe src="https://hectickiwi.github.io/Web-Osu-Mania/" allowfullscreen></iframe>
   </div>
 
   <script>
-    // --- Load Cluster Rush Unity build ---
-    var Module = {
-      TOTAL_MEMORY: 268435456,
-      backgroundColor: "#222C36",
-      splashStyle: "Dark",
-      dataUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.data",
-      codeUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.js",
-      asmUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.asm.js",
-      memUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.mem",
-    };
-    const unityScript = document.createElement("script");
-    unityScript.src = "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/UnityLoader.js";
-    document.body.appendChild(unityScript);
-
     // --- MENU LOGIC ---
     const menuBtn = document.getElementById("menuBtn");
     const menu = document.getElementById("menu");
@@ -163,14 +146,14 @@
       menu.style.display = "none";
     };
 
-    // --- Open in New Tab button (hosted URLs only) ---
+    // --- Open in New Tab button ---
     newTabBtn.onclick = () => {
       const isOsuVisible = osuContainer.style.display === "block";
       const url = isOsuVisible
         ? "https://hectickiwi.github.io/Web-Osu-Mania/"
-        : "https://kingnoobisw.github.io/ClusterRush/"; // Hosted Cluster Rush
+        : "https://swordslasher.com/games/cluster-rush/game.html";
       const newWin = window.open(url, "_blank");
-      if (!newWin) window.location.href = url; // fallback if popup blocked
+      if (!newWin) window.location.href = url;
     };
 
     // --- Redirect key ---
@@ -181,5 +164,6 @@
       }
     });
   </script>
+
 </body>
 </html>
