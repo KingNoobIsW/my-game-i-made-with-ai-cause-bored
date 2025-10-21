@@ -78,7 +78,7 @@
     };
 
     osuBtn.onclick = () => {
-      window.open("https://hectickiwi.github.io/Web-Osu-Mania/", "_blank");
+      window.open("https://kingnoobisw.github.io/WebOsuMania/", "_blank");
     };
 
     clusterBtn.onclick = () => {
