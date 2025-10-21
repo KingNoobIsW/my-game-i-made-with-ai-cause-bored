@@ -4,48 +4,41 @@
   <meta charset="utf-8">
   <title>Game Menu</title>
   <style>
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
       background: #111;
-      overflow: hidden;
       font-family: sans-serif;
+      height: 100vh;
+      overflow: hidden;
     }
 
-    canvas {
-      display: block;
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100vw;
       height: 100vh;
       border: none;
-    }
-
-    #menuBtn {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 10;
-      background: #333;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 10px;
-      cursor: pointer;
+      z-index: 0;
     }
 
     #menu {
       position: absolute;
-      top: 45px;
+      top: 10px;
       left: 10px;
-      z-index: 10;
-      background: #222;
+      z-index: 1000;
+      background: rgba(34, 34, 34, 0.95);
       border: 1px solid #555;
-      border-radius: 6px;
+      border-radius: 8px;
       padding: 10px;
-      display: none;
+      min-width: 220px;
     }
 
     #menu input {
-      width: 220px;
+      width: 90%;
       padding: 4px;
+      margin-bottom: 6px;
       border-radius: 4px;
       border: 1px solid #555;
       background: #111;
@@ -53,20 +46,21 @@
     }
 
     #menu button {
-      margin-top: 6px;
-      background: #0f0;
+      display: block;
+      width: 90%;
+      margin: 6px auto;
+      padding: 6px 0;
       border: none;
-      padding: 5px 12px;
-      border-radius: 4px;
+      border-radius: 6px;
+      background: #0f0;
+      font-weight: bold;
       cursor: pointer;
-      width: 100%;
     }
   </style>
 </head>
 <body>
 
-  <!-- Menu Button + Dropdown -->
-  <button id="menuBtn">☰ Menu</button>
+  <!-- Menu -->
   <div id="menu">
     <label>Redirect link:</label><br>
     <input type="text" id="linkInput" placeholder="https://example.com"><br>
@@ -77,49 +71,46 @@
     <button id="soundboardBtn">🔊 Play Soundboard</button>
   </div>
 
+  <!-- Iframes for games -->
+  <iframe id="gameFrame" src=""></iframe>
+
   <script>
-    const menuBtn = document.getElementById("menuBtn");
-    const menu = document.getElementById("menu");
     const linkInput = document.getElementById("linkInput");
     const saveBtn = document.getElementById("saveBtn");
     const osuBtn = document.getElementById("osuBtn");
     const clusterBtn = document.getElementById("clusterBtn");
     const soundboardBtn = document.getElementById("soundboardBtn");
+    const gameFrame = document.getElementById("gameFrame");
 
     // Load saved redirect link
     linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
-
-    menuBtn.onclick = () => {
-      menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
-    };
 
     saveBtn.onclick = () => {
       const link = linkInput.value.trim();
       if (link) {
         localStorage.setItem("redirectLink", link);
-        alert("✅ Link saved! Press '>' to go there.");
-        menu.style.display = "none";
+        alert("✅ Link saved!");
       }
     };
 
-    // Open games in the same tab
+    // Load games in the same iframe
     osuBtn.onclick = () => {
-      window.location.href = "https://kingnoobisw.github.io/WebOsuMania/";
+      gameFrame.src = "https://kingnoobisw.github.io/WebOsuMania/";
     };
 
     clusterBtn.onclick = () => {
-      window.location.href = "https://swordslasher.com/games/cluster-rush/game.html";
+      gameFrame.src = "https://swordslasher.com/games/cluster-rush/game.html";
     };
 
     soundboardBtn.onclick = () => {
-      window.location.href = "https://special-scarlet-yijlvuwhem.edgeone.app/";
+      gameFrame.src = "https://special-scarlet-yijlvuwhem.edgeone.app/";
     };
 
     // Redirect key
     document.addEventListener("keydown", function(event) {
       if (event.key === ">") {
         const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
-        window.location.href = link;
+        gameFrame.src = link;
       }
     });
   </script>
