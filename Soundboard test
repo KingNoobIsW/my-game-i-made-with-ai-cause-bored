@@ -2,7 +2,7 @@
 <html lang="en-us">
 <head>
   <meta charset="utf-8">
-  <title>Cluster Rush + Web Osu Mania + Soundboard Menu</title>
+  <title>Cluster Rush + Web Osu Mania + Coolmath Games Menu</title>
   <style>
     html, body {
       margin: 0;
@@ -92,7 +92,7 @@
     <hr>
     <button id="osuBtn">🎵 Play Web Osu Mania</button>
     <button id="clusterBtn">🦖 Play Cluster Rush</button>
-    <button id="soundboardBtn">🔊 Play Soundboard</button>
+    <button id="coolmathBtn">🧮 Play Coolmath Games</button>
     <button id="openLinkBtn">➡ Go to Saved Link</button>
   </div>
 
@@ -106,7 +106,7 @@
     const saveBtn = document.getElementById("saveBtn");
     const osuBtn = document.getElementById("osuBtn");
     const clusterBtn = document.getElementById("clusterBtn");
-    const soundboardBtn = document.getElementById("soundboardBtn");
+    const coolmathBtn = document.getElementById("coolmathBtn");
     const openLinkBtn = document.getElementById("openLinkBtn");
     const gameFrame = document.getElementById("gameFrame");
 
@@ -138,8 +138,8 @@
       menu.style.display = "none";
     };
 
-    soundboardBtn.onclick = () => {
-      gameFrame.src = "https://special-scarlet-yijlvuwhem.edgeone.app/?v=" + new Date().getTime();
+    coolmathBtn.onclick = () => {
+      gameFrame.src = "https://www.coolmathgames.com/?v=" + new Date().getTime();
       menu.style.display = "none";
     };
 
