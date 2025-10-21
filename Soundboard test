@@ -2,21 +2,33 @@
 <html lang="en-us">
 <head>
   <meta charset="utf-8">
-  <title>Cluster Rush + Web Osu Mania + Soundboard Menu</title>
+  <title>Game Menu with Iframe</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
+      height: 100vh;
       background: #111;
       font-family: sans-serif;
+      overflow: hidden;
+    }
+
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
       height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border: none;
+      z-index: 0;
     }
 
     #menu {
-      background: rgba(34, 34, 34, 0.9);
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(34,34,34,0.9);
       border: 1px solid #555;
       border-radius: 8px;
       padding: 20px;
@@ -50,6 +62,7 @@
 </head>
 <body>
 
+  <!-- Menu -->
   <div id="menu">
     <label>Redirect link:</label><br>
     <input type="text" id="linkInput" placeholder="https://example.com"><br>
@@ -61,14 +74,17 @@
     <button id="openLinkBtn">➡ Go to Saved Link</button>
   </div>
 
+  <!-- Iframe for games -->
+  <iframe id="gameFrame" src=""></iframe>
+
   <script>
-    const menu = document.getElementById("menu");
     const linkInput = document.getElementById("linkInput");
     const saveBtn = document.getElementById("saveBtn");
     const osuBtn = document.getElementById("osuBtn");
     const clusterBtn = document.getElementById("clusterBtn");
     const soundboardBtn = document.getElementById("soundboardBtn");
     const openLinkBtn = document.getElementById("openLinkBtn");
+    const gameFrame = document.getElementById("gameFrame");
 
     // Load saved redirect link
     linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
@@ -81,41 +97,33 @@
       }
     };
 
-    // Web Osu Mania (cache-proof)
+    // Load games inside the iframe
     osuBtn.onclick = () => {
-      const url = "https://kingnoobisw.github.io/WebOsuMania/?v=" + new Date().getTime();
-      window.open(url, "_blank");
+      gameFrame.src = "https://kingnoobisw.github.io/WebOsuMania/?v=" + new Date().getTime();
     };
 
-    // Cluster Rush (cache-proof)
     clusterBtn.onclick = () => {
-      const url = "https://swordslasher.com/games/cluster-rush/game.html?v=" + new Date().getTime();
-      window.open(url, "_blank");
+      gameFrame.src = "https://swordslasher.com/games/cluster-rush/game.html?v=" + new Date().getTime();
     };
 
-    // Soundboard (cache-proof)
     soundboardBtn.onclick = () => {
-      const url = "https://special-scarlet-yijlvuwhem.edgeone.app/?v=" + new Date().getTime();
-      window.open(url, "_blank");
+      gameFrame.src = "https://special-scarlet-yijlvuwhem.edgeone.app/?v=" + new Date().getTime();
     };
 
-    // Saved redirect link
     openLinkBtn.onclick = () => {
       const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
-      const url = link + "?v=" + new Date().getTime();
-      window.open(url, "_blank");
+      gameFrame.src = link + "?v=" + new Date().getTime();
     };
 
-    // Redirect key
     document.addEventListener("keydown", function(event) {
       if (event.key === ">") {
         const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
-        const url = link + "?v=" + new Date().getTime();
-        window.open(url, "_blank");
+        gameFrame.src = link + "?v=" + new Date().getTime();
       }
     });
 
     // --- Draggable menu ---
+    const menu = document.getElementById("menu");
     let isDragging = false;
     let offsetX = 0;
     let offsetY = 0;
