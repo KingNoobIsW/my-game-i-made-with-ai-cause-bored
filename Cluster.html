@@ -63,7 +63,7 @@
       cursor: pointer;
       width: 100%;
     }
-    #clusterRushContainer, #osuContainer {
+    #clusterRushContainer, #osuContainer, #soundboardContainer {
       width: 100vw;
       height: 100vh;
     }
@@ -87,6 +87,7 @@
     <hr>
     <button id="osuBtn">🎵 Play Web Osu Mania</button>
     <button id="clusterBtn">🦖 Play Cluster Rush</button>
+    <button id="soundboardBtn">🔊 Play Soundboard</button>
   </div>
 
   <!-- --- GAME CONTAINERS --- -->
@@ -96,6 +97,10 @@
 
   <div id="osuContainer" style="display:none;">
     <iframe id="osuFrame" src="https://hectickiwi.github.io/Web-Osu-Mania/" allow="fullscreen" allowfullscreen></iframe>
+  </div>
+
+  <div id="soundboardContainer" style="display:none;">
+    <iframe id="soundboardFrame" src="https://kingnoobisw.github.io/soundboard2/" allow="fullscreen" allowfullscreen></iframe>
   </div>
 
   <script>
@@ -120,10 +125,12 @@
     const saveBtn = document.getElementById("saveBtn");
     const osuBtn = document.getElementById("osuBtn");
     const clusterBtn = document.getElementById("clusterBtn");
+    const soundboardBtn = document.getElementById("soundboardBtn");
     const newTabBtn = document.getElementById("newTabBtn");
 
     const clusterRushContainer = document.getElementById("clusterRushContainer");
     const osuContainer = document.getElementById("osuContainer");
+    const soundboardContainer = document.getElementById("soundboardContainer");
 
     // load saved link
     linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
@@ -144,22 +151,34 @@
     // --- Switching between games ---
     osuBtn.onclick = () => {
       clusterRushContainer.style.display = "none";
+      soundboardContainer.style.display = "none";
       osuContainer.style.display = "block";
       menu.style.display = "none";
     };
 
     clusterBtn.onclick = () => {
       osuContainer.style.display = "none";
+      soundboardContainer.style.display = "none";
       clusterRushContainer.style.display = "block";
+      menu.style.display = "none";
+    };
+
+    soundboardBtn.onclick = () => {
+      clusterRushContainer.style.display = "none";
+      osuContainer.style.display = "none";
+      soundboardContainer.style.display = "block";
       menu.style.display = "none";
     };
 
     // --- Open in New Tab button logic ---
     newTabBtn.onclick = () => {
       const isOsuVisible = osuContainer.style.display === "block";
+      const isSoundboardVisible = soundboardContainer.style.display === "block";
       const url = isOsuVisible
         ? "https://hectickiwi.github.io/Web-Osu-Mania/"
-        : "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/index.html";
+        : isSoundboardVisible
+          ? "https://kingnoobisw.github.io/soundboard2/"
+          : "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/index.html";
       window.open(url, "_blank", "width=1024,height=768");
     };
 
