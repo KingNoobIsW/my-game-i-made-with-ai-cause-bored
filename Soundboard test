@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <title>Game Menu</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #111;
+      font-family: sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #menu {
+      background: rgba(34, 34, 34, 0.9);
+      border: 1px solid #555;
+      border-radius: 8px;
+      padding: 20px;
+      min-width: 300px;
+      text-align: center;
+      cursor: move;
+    }
+
+    #menu input {
+      width: 90%;
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid #555;
+      margin-bottom: 10px;
+      background: #111;
+      color: #fff;
+    }
+
+    #menu button {
+      display: block;
+      width: 90%;
+      margin: 6px auto;
+      padding: 8px 0;
+      border: none;
+      border-radius: 6px;
+      background: #0f0;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="menu">
+    <label>Redirect link:</label><br>
+    <input type="text" id="linkInput" placeholder="https://example.com"><br>
+    <button id="saveBtn">Save Link</button>
+    <hr>
+    <button id="osuBtn">🎵 Play Web Osu Mania</button>
+    <button id="clusterBtn">🦖 Play Cluster Rush</button>
+    <button id="soundboardBtn">🔊 Play Soundboard</button>
+    <button id="openLinkBtn">➡ Go to Saved Link</button>
+  </div>
+
+  <script>
+    const menu = document.getElementById("menu");
+    const linkInput = document.getElementById("linkInput");
+    const saveBtn = document.getElementById("saveBtn");
+    const osuBtn = document.getElementById("osuBtn");
+    const clusterBtn = document.getElementById("clusterBtn");
+    const soundboardBtn = document.getElementById("soundboardBtn");
+    const openLinkBtn = document.getElementById("openLinkBtn");
+
+    // Load saved redirect link
+    linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
+
+    saveBtn.onclick = () => {
+      const link = linkInput.value.trim();
+      if (link) {
+        localStorage.setItem("redirectLink", link);
+        alert("✅ Link saved!");
+      }
+    };
+
+    // Web Osu Mania (old URL)
+    osuBtn.onclick = () => {
+      const url = "https://hectickiwi.github.io/Web-Osu-Mania/?v=" + new Date().getTime();
+      window.open(url, "_blank");
+    };
+
+    // Cluster Rush
+    clusterBtn.onclick = () => {
+      const url = "https://swordslasher.com/games/cluster-rush/game.html?v=" + new Date().getTime();
+      window.open(url, "_blank");
+    };
+
+    // Soundboard
+    soundboardBtn.onclick = () => {
+      const url = "https://special-scarlet-yijlvuwhem.edgeone.app/?v=" + new Date().getTime();
+      window.open(url, "_blank");
+    };
+
+    // Saved redirect link
+    openLinkBtn.onclick = () => {
+      const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
+      const url = link + "?v=" + new Date().getTime();
+      window.open(url, "_blank");
+    };
+
+    // Redirect key
+    document.addEventListener("keydown", function(event) {
+      if (event.key === ">") {
+        const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
+        const url = link + "?v=" + new Date().getTime();
+        window.open(url, "_blank");
+      }
+    });
+
+    // --- Draggable menu ---
+    let isDragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    menu.addEventListener('mousedown', function(e) {
+      isDragging = true;
+      offsetX = e.clientX - menu.offsetLeft;
+      offsetY = e.clientY - menu.offsetTop;
+      menu.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', function(e) {
+      if (!isDragging) return;
+      let left = e.clientX - offsetX;
+      let top = e.clientY - offsetY;
+
+      left = Math.max(0, Math.min(left, window.innerWidth - menu.offsetWidth));
+      top = Math.max(0, Math.min(top, window.innerHeight - menu.offsetHeight));
+
+      menu.style.left = left + 'px';
+      menu.style.top = top + 'px';
+    });
+
+    document.addEventListener('mouseup', function() {
+      if (!isDragging) return;
+      isDragging = false;
+      menu.style.cursor = 'move';
+
+      // Snap to nearest edge
+      const menuRect = menu.getBoundingClientRect();
+      const middleX = window.innerWidth / 2;
+      const middleY = window.innerHeight / 2;
+
+      let snapLeft = (menuRect.left + menuRect.width / 2 < middleX) ? 10 : window.innerWidth - menu.offsetWidth - 10;
+      let snapTop = (menuRect.top + menuRect.height / 2 < middleY) ? 10 : window.innerHeight - menu.offsetHeight - 10;
+
+      menu.style.left = snapLeft + 'px';
+      menu.style.top = snapTop + 'px';
+    });
+  </script>
+
+</body>
+</html>
