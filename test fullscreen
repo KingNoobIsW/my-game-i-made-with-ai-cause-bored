@@ -79,20 +79,22 @@
       }
     };
 
+    // Web Osu Mania (cache-proof)
     osuBtn.onclick = () => {
-      // ✅ Cache-proof: add unique query string every click
       const url = "https://kingnoobisw.github.io/WebOsuMania/?v=" + new Date().getTime();
       window.open(url, "_blank");
     };
 
+    // Cluster Rush (cache-proof)
     clusterBtn.onclick = () => {
       const url = "https://swordslasher.com/games/cluster-rush/game.html?v=" + new Date().getTime();
       window.open(url, "_blank");
     };
 
+    // Saved redirect link
     openLinkBtn.onclick = () => {
       const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
-      const url = link + "?v=" + new Date().getTime(); // optional cache-busting for redirect
+      const url = link + "?v=" + new Date().getTime();
       window.open(url, "_blank");
     };
 
