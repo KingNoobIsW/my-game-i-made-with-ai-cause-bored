@@ -163,12 +163,12 @@
       menu.style.display = "none";
     };
 
-    // --- Open in New Tab button (fixed hosted URLs) ---
+    // --- Open in New Tab button (hosted URLs only) ---
     newTabBtn.onclick = () => {
       const isOsuVisible = osuContainer.style.display === "block";
       const url = isOsuVisible
         ? "https://hectickiwi.github.io/Web-Osu-Mania/"
-        : "https://KingNoobIsW.github.io/ClusterRush/";
+        : "https://KingNoobIsW.github.io/ClusterRush/index.html"; // <- hosted HTML
       const newWin = window.open(url, "_blank");
       if (!newWin) window.location.href = url; // fallback if popup blocked
     };
