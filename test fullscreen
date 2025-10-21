@@ -80,12 +80,14 @@
     };
 
     osuBtn.onclick = () => {
-      // ✅ Updated to your new WebOsuMania site
-      window.open("https://kingnoobisw.github.io/WebOsuMania/", "_blank");
+      // ✅ Cache-busting by adding timestamp
+      const url = "https://kingnoobisw.github.io/WebOsuMania/?t=" + new Date().getTime();
+      window.open(url, "_blank");
     };
 
     clusterBtn.onclick = () => {
-      window.open("https://swordslasher.com/games/cluster-rush/game.html", "_blank");
+      const url = "https://swordslasher.com/games/cluster-rush/game.html?t=" + new Date().getTime();
+      window.open(url, "_blank");
     };
 
     openLinkBtn.onclick = () => {
