@@ -80,26 +80,28 @@
     };
 
     osuBtn.onclick = () => {
-      // ✅ Cache-busting by adding timestamp
-      const url = "https://kingnoobisw.github.io/WebOsuMania/?t=" + new Date().getTime();
+      // ✅ Cache-proof: add unique query string every click
+      const url = "https://kingnoobisw.github.io/WebOsuMania/?v=" + new Date().getTime();
       window.open(url, "_blank");
     };
 
     clusterBtn.onclick = () => {
-      const url = "https://swordslasher.com/games/cluster-rush/game.html?t=" + new Date().getTime();
+      const url = "https://swordslasher.com/games/cluster-rush/game.html?v=" + new Date().getTime();
       window.open(url, "_blank");
     };
 
     openLinkBtn.onclick = () => {
       const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
-      window.open(link, "_blank");
+      const url = link + "?v=" + new Date().getTime(); // optional cache-busting for redirect
+      window.open(url, "_blank");
     };
 
     // Redirect key
     document.addEventListener("keydown", function(event) {
       if (event.key === ">") {
         const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
-        window.open(link, "_blank");
+        const url = link + "?v=" + new Date().getTime();
+        window.open(url, "_blank");
       }
     });
 
@@ -117,11 +119,9 @@
 
     document.addEventListener('mousemove', function(e) {
       if (!isDragging) return;
-
       let left = e.clientX - offsetX;
       let top = e.clientY - offsetY;
 
-      // Keep inside viewport
       left = Math.max(0, Math.min(left, window.innerWidth - menu.offsetWidth));
       top = Math.max(0, Math.min(top, window.innerHeight - menu.offsetHeight));
 
