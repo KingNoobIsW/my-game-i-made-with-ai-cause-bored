@@ -125,7 +125,7 @@
     const clusterRushContainer = document.getElementById("clusterRushContainer");
     const osuContainer = document.getElementById("osuContainer");
 
-    // load saved link
+    // Load saved redirect link
     linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
 
     menuBtn.onclick = () => {
@@ -136,12 +136,12 @@
       const link = linkInput.value.trim();
       if (link) {
         localStorage.setItem("redirectLink", link);
-        alert("Link saved! Press '>' to go there.");
+        alert("✅ Link saved! Press '>' to go there.");
         menu.style.display = "none";
       }
     };
 
-    // --- Switching between games ---
+    // --- Switch between games ---
     osuBtn.onclick = () => {
       clusterRushContainer.style.display = "none";
       osuContainer.style.display = "block";
@@ -154,13 +154,14 @@
       menu.style.display = "none";
     };
 
-    // --- Open in New Tab button logic ---
+    // --- Open in New Tab button ---
     newTabBtn.onclick = () => {
       const isOsuVisible = osuContainer.style.display === "block";
       const url = isOsuVisible
         ? "https://hectickiwi.github.io/Web-Osu-Mania/"
-        : "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/index.html";
-      window.open(url, "_blank", "width=1024,height=768");
+        : "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/index.html"; // ✅ fixed entry point
+      const newWin = window.open(url, "_blank", "width=1024,height=768");
+      if (!newWin) window.location.href = url; // fallback if popup blocked
     };
 
     // --- Redirect key ---
