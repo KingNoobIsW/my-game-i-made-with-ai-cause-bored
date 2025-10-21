@@ -2,54 +2,84 @@
 <html lang="en-us">
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>Cluster Rush + Web Osu Mania Menu</title>
   <style>
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
       background: #111;
+      overflow: hidden;
       font-family: sans-serif;
+    }
+    canvas, iframe {
+      display: block;
+      width: 100vw;
       height: 100vh;
+      border: none;
+      touch-action: none;
+    }
+    #topButtons {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      gap: 10px;
     }
-
+    #topButtons button {
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
     #menu {
-      background: rgba(34, 34, 34, 0.9);
+      position: absolute;
+      top: 45px;
+      left: 10px;
+      z-index: 10;
+      background: #222;
       border: 1px solid #555;
-      border-radius: 8px;
-      padding: 20px;
-      min-width: 300px;
-      text-align: center;
-      cursor: move;
+      border-radius: 6px;
+      padding: 10px;
+      display: none;
     }
-
     #menu input {
-      width: 90%;
-      padding: 6px;
+      width: 220px;
+      padding: 4px;
       border-radius: 4px;
       border: 1px solid #555;
-      margin-bottom: 10px;
       background: #111;
       color: #fff;
     }
-
     #menu button {
-      display: block;
-      width: 90%;
-      margin: 6px auto;
-      padding: 8px 0;
-      border: none;
-      border-radius: 6px;
+      margin-top: 6px;
       background: #0f0;
-      font-weight: bold;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 4px;
       cursor: pointer;
+      width: 100%;
+    }
+    #clusterRushContainer, #osuContainer {
+      width: 100vw;
+      height: 100vh;
     }
   </style>
+  <link href="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/TemplateData/style.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/TemplateData/UnityProgress.js"></script>
 </head>
-<body>
+<body class="template">
 
+  <!-- --- MENU + NEW TAB BUTTONS --- -->
+  <div id="topButtons">
+    <button id="menuBtn">☰ Menu</button>
+    <button id="newTabBtn">↗ Open in New Tab</button>
+  </div>
+
+  <!-- --- MENU DROPDOWN --- -->
   <div id="menu">
     <label>Redirect link:</label><br>
     <input type="text" id="linkInput" placeholder="https://example.com"><br>
@@ -57,97 +87,89 @@
     <hr>
     <button id="osuBtn">🎵 Play Web Osu Mania</button>
     <button id="clusterBtn">🦖 Play Cluster Rush</button>
-    <button id="openLinkBtn">➡ Go to Saved Link</button>
+  </div>
+
+  <!-- --- GAME CONTAINERS --- -->
+  <div id="clusterRushContainer" class="template-wrap clear">
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+  </div>
+
+  <div id="osuContainer" style="display:none;">
+    <iframe id="osuFrame" src="https://hectickiwi.github.io/Web-Osu-Mania/" allow="fullscreen" allowfullscreen></iframe>
   </div>
 
   <script>
+    // --- Load Cluster Rush Unity build ---
+    var Module = {
+      TOTAL_MEMORY: 268435456,
+      backgroundColor: "#222C36",
+      splashStyle: "Dark",
+      dataUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.data",
+      codeUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.js",
+      asmUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.asm.js",
+      memUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.mem",
+    };
+    const unityScript = document.createElement("script");
+    unityScript.src = "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/UnityLoader.js";
+    document.body.appendChild(unityScript);
+
+    // --- MENU LOGIC ---
+    const menuBtn = document.getElementById("menuBtn");
     const menu = document.getElementById("menu");
     const linkInput = document.getElementById("linkInput");
     const saveBtn = document.getElementById("saveBtn");
     const osuBtn = document.getElementById("osuBtn");
     const clusterBtn = document.getElementById("clusterBtn");
-    const openLinkBtn = document.getElementById("openLinkBtn");
+    const newTabBtn = document.getElementById("newTabBtn");
 
-    // Load saved redirect link
+    const clusterRushContainer = document.getElementById("clusterRushContainer");
+    const osuContainer = document.getElementById("osuContainer");
+
+    // load saved link
     linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
+
+    menuBtn.onclick = () => {
+      menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
+    };
 
     saveBtn.onclick = () => {
       const link = linkInput.value.trim();
       if (link) {
         localStorage.setItem("redirectLink", link);
-        alert("✅ Link saved!");
+        alert("Link saved! Press '>' to go there.");
+        menu.style.display = "none";
       }
     };
 
-    // Web Osu Mania (cache-proof)
+    // --- Switching between games ---
     osuBtn.onclick = () => {
-      const url = "https://kingnoobisw.github.io/WebOsuMania/?v=" + new Date().getTime();
-      window.open(url, "_blank");
+      clusterRushContainer.style.display = "none";
+      osuContainer.style.display = "block";
+      menu.style.display = "none";
     };
 
-    // Cluster Rush (cache-proof)
     clusterBtn.onclick = () => {
-      const url = "https://swordslasher.com/games/cluster-rush/game.html?v=" + new Date().getTime();
-      window.open(url, "_blank");
+      osuContainer.style.display = "none";
+      clusterRushContainer.style.display = "block";
+      menu.style.display = "none";
     };
 
-    // Saved redirect link
-    openLinkBtn.onclick = () => {
-      const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
-      const url = link + "?v=" + new Date().getTime();
-      window.open(url, "_blank");
+    // --- Open in New Tab button logic ---
+    newTabBtn.onclick = () => {
+      const isOsuVisible = osuContainer.style.display === "block";
+      const url = isOsuVisible
+        ? "https://hectickiwi.github.io/Web-Osu-Mania/"
+        : "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/index.html";
+      window.open(url, "_blank", "width=1024,height=768");
     };
 
-    // Redirect key
+    // --- Redirect key ---
     document.addEventListener("keydown", function(event) {
       if (event.key === ">") {
         const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
-        const url = link + "?v=" + new Date().getTime();
-        window.open(url, "_blank");
+        window.location.href = link;
       }
     });
-
-    // --- Draggable menu ---
-    let isDragging = false;
-    let offsetX = 0;
-    let offsetY = 0;
-
-    menu.addEventListener('mousedown', function(e) {
-      isDragging = true;
-      offsetX = e.clientX - menu.offsetLeft;
-      offsetY = e.clientY - menu.offsetTop;
-      menu.style.cursor = 'grabbing';
-    });
-
-    document.addEventListener('mousemove', function(e) {
-      if (!isDragging) return;
-      let left = e.clientX - offsetX;
-      let top = e.clientY - offsetY;
-
-      left = Math.max(0, Math.min(left, window.innerWidth - menu.offsetWidth));
-      top = Math.max(0, Math.min(top, window.innerHeight - menu.offsetHeight));
-
-      menu.style.left = left + 'px';
-      menu.style.top = top + 'px';
-    });
-
-    document.addEventListener('mouseup', function() {
-      if (!isDragging) return;
-      isDragging = false;
-      menu.style.cursor = 'move';
-
-      // Snap to nearest edge
-      const menuRect = menu.getBoundingClientRect();
-      const middleX = window.innerWidth / 2;
-      const middleY = window.innerHeight / 2;
-
-      let snapLeft = (menuRect.left + menuRect.width / 2 < middleX) ? 10 : window.innerWidth - menu.offsetWidth - 10;
-      let snapTop = (menuRect.top + menuRect.height / 2 < middleY) ? 10 : window.innerHeight - menu.offsetHeight - 10;
-
-      menu.style.left = snapLeft + 'px';
-      menu.style.top = snapTop + 'px';
-    });
   </script>
-
 </body>
 </html>
