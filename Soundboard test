@@ -10,12 +10,13 @@
       background: #111;
       font-family: sans-serif;
       height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      overflow: hidden;
     }
 
     #menu {
+      position: absolute;
+      top: 10px;
+      left: 10px;
       background: rgba(34, 34, 34, 0.9);
       border: 1px solid #555;
       border-radius: 8px;
@@ -23,6 +24,7 @@
       min-width: 300px;
       text-align: center;
       cursor: move;
+      z-index: 1000;
     }
 
     #menu input {
@@ -46,6 +48,16 @@
       font-weight: bold;
       cursor: pointer;
     }
+
+    #gameFrame {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      z-index: 0;
+    }
   </style>
 </head>
 <body>
@@ -61,14 +73,16 @@
     <button id="openLinkBtn">➡ Go to Saved Link</button>
   </div>
 
+  <iframe id="gameFrame" src=""></iframe>
+
   <script>
-    const menu = document.getElementById("menu");
     const linkInput = document.getElementById("linkInput");
     const saveBtn = document.getElementById("saveBtn");
     const osuBtn = document.getElementById("osuBtn");
     const clusterBtn = document.getElementById("clusterBtn");
     const soundboardBtn = document.getElementById("soundboardBtn");
     const openLinkBtn = document.getElementById("openLinkBtn");
+    const gameFrame = document.getElementById("gameFrame");
 
     // Load saved redirect link
     linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
@@ -81,41 +95,34 @@
       }
     };
 
-    // Web Osu Mania (old URL)
+    // Load games in iframe
     osuBtn.onclick = () => {
-      const url = "https://hectickiwi.github.io/Web-Osu-Mania/?v=" + new Date().getTime();
-      window.open(url, "_blank");
+      gameFrame.src = "https://hectickiwi.github.io/Web-Osu-Mania/?v=" + new Date().getTime();
     };
 
-    // Cluster Rush
     clusterBtn.onclick = () => {
-      const url = "https://swordslasher.com/games/cluster-rush/game.html?v=" + new Date().getTime();
-      window.open(url, "_blank");
+      gameFrame.src = "https://swordslasher.com/games/cluster-rush/game.html?v=" + new Date().getTime();
     };
 
-    // Soundboard
     soundboardBtn.onclick = () => {
-      const url = "https://special-scarlet-yijlvuwhem.edgeone.app/?v=" + new Date().getTime();
-      window.open(url, "_blank");
+      gameFrame.src = "https://special-scarlet-yijlvuwhem.edgeone.app/?v=" + new Date().getTime();
     };
 
-    // Saved redirect link
     openLinkBtn.onclick = () => {
       const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
-      const url = link + "?v=" + new Date().getTime();
-      window.open(url, "_blank");
+      gameFrame.src = link + "?v=" + new Date().getTime();
     };
 
     // Redirect key
     document.addEventListener("keydown", function(event) {
       if (event.key === ">") {
         const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
-        const url = link + "?v=" + new Date().getTime();
-        window.open(url, "_blank");
+        gameFrame.src = link + "?v=" + new Date().getTime();
       }
     });
 
     // --- Draggable menu ---
+    let menu = document.getElementById('menu');
     let isDragging = false;
     let offsetX = 0;
     let offsetY = 0;
@@ -144,7 +151,6 @@
       isDragging = false;
       menu.style.cursor = 'move';
 
-      // Snap to nearest edge
       const menuRect = menu.getBoundingClientRect();
       const middleX = window.innerWidth / 2;
       const middleY = window.innerHeight / 2;
