@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Cluster Rush + Web Osu Mania Menu</title>
+  <title>Cluster Rush + Web Osu Mania Menu + Soundboard</title>
   <style>
     body {
       margin: 0;
@@ -45,9 +45,10 @@
       border-radius: 6px;
       padding: 10px;
       display: none;
+      width: 250px;
     }
     #menu input {
-      width: 220px;
+      width: 100%;
       padding: 4px;
       border-radius: 4px;
       border: 1px solid #555;
@@ -63,23 +64,39 @@
       cursor: pointer;
       width: 100%;
     }
-    #clusterRushContainer, #osuContainer, #soundboardContainer, #driftContainer {
-      width: 100vw;
-      height: 100vh;
+    #uploadMenuControls {
+      margin-top: 10px;
+      display: none;
+    }
+    #uploadMenuControls input,
+    #uploadMenuControls button {
+      width: 100%;
+      margin-top: 6px;
+      padding: 6px;
+      border-radius: 4px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #soundList button {
+      background: #333;
+      color: #fff;
+      width: 100%;
+      border: none;
+      border-radius: 4px;
+      padding: 6px;
+      margin-top: 4px;
+      cursor: pointer;
     }
   </style>
-  <link href="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/TemplateData/style.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/TemplateData/UnityProgress.js"></script>
 </head>
 <body class="template">
 
-  <!-- --- MENU + NEW TAB BUTTONS --- -->
   <div id="topButtons">
     <button id="menuBtn">☰ Menu</button>
     <button id="newTabBtn">↗ Open in New Tab</button>
   </div>
 
-  <!-- --- MENU DROPDOWN --- -->
   <div id="menu">
     <label>Redirect link:</label><br>
     <input type="text" id="linkInput" placeholder="https://example.com"><br>
@@ -87,43 +104,39 @@
     <hr>
     <button id="osuBtn">🎵 Play Web Osu Mania</button>
     <button id="clusterBtn">🦖 Play Cluster Rush</button>
-    <button id="soundboardBtn">🔊 Play Soundboard</button>
-    <button id="driftBtn">🚗 Play Drift Boss</button>
+    <button id="soundboardBtn">🔊 Soundboard</button>
+    <button id="driftBtn">🚗 Drift Boss</button>
+
+    <!-- Upload Sound Controls -->
+    <div id="uploadMenuControls">
+      <input type="file" id="soundUpload" accept=".mp3, .wav">
+      <input type="text" id="soundName" placeholder="Enter sound name">
+      <button id="saveSoundBtn">💾 Save Sound</button>
+      <div id="soundList"></div>
+    </div>
   </div>
 
-  <!-- --- GAME CONTAINERS --- -->
-  <div id="clusterRushContainer" class="template-wrap clear">
+  <!-- Containers -->
+  <div id="clusterRushContainer">
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
   </div>
 
   <div id="osuContainer" style="display:none;">
-    <iframe id="osuFrame" src="https://hectickiwi.github.io/Web-Osu-Mania/" allow="fullscreen" allowfullscreen></iframe>
+    <iframe src="https://hectickiwi.github.io/Web-Osu-Mania/" allowfullscreen></iframe>
   </div>
 
   <div id="soundboardContainer" style="display:none;">
-    <iframe id="soundboardFrame" src="https://kingnoobisw.github.io/soundboard2/" allow="fullscreen" allowfullscreen></iframe>
+    <div id="soundboardArea" style="padding:20px;color:white;">
+      <h2>🎧 Custom Soundboard</h2>
+      <div id="savedSounds"></div>
+    </div>
   </div>
 
   <div id="driftContainer" style="display:none;">
-    <iframe id="driftFrame" src="https://kingnoobisw.github.io/drift-boss/" allow="fullscreen" allowfullscreen></iframe>
+    <iframe src="https://kingnoobisw.github.io/drift-boss/" allowfullscreen></iframe>
   </div>
 
   <script>
-    // --- Load Cluster Rush Unity build ---
-    var Module = {
-      TOTAL_MEMORY: 268435456,
-      backgroundColor: "#222C36",
-      splashStyle: "Dark",
-      dataUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.data",
-      codeUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.js",
-      asmUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.asm.js",
-      memUrl: "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/NG.mem",
-    };
-    const unityScript = document.createElement("script");
-    unityScript.src = "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/Release/UnityLoader.js";
-    document.body.appendChild(unityScript);
-
-    // --- MENU LOGIC ---
     const menuBtn = document.getElementById("menuBtn");
     const menu = document.getElementById("menu");
     const linkInput = document.getElementById("linkInput");
@@ -139,56 +152,42 @@
     const soundboardContainer = document.getElementById("soundboardContainer");
     const driftContainer = document.getElementById("driftContainer");
 
-    // load saved link
+    const uploadMenuControls = document.getElementById("uploadMenuControls");
+    const soundUpload = document.getElementById("soundUpload");
+    const soundName = document.getElementById("soundName");
+    const saveSoundBtn = document.getElementById("saveSoundBtn");
+    const soundList = document.getElementById("soundList");
+    const savedSoundsDiv = document.getElementById("savedSounds");
+
     linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
 
+    // Menu toggle
     menuBtn.onclick = () => {
       menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
     };
 
+    // Save redirect link
     saveBtn.onclick = () => {
       const link = linkInput.value.trim();
       if (link) {
         localStorage.setItem("redirectLink", link);
-        alert("Link saved! Press '>' to go there.");
+        alert("✅ Link saved! Press '>' to go there.");
         menu.style.display = "none";
       }
     };
 
-    // --- Switching between games ---
-    osuBtn.onclick = () => {
-      clusterRushContainer.style.display = "none";
-      soundboardContainer.style.display = "none";
-      driftContainer.style.display = "none";
-      osuContainer.style.display = "block";
-      menu.style.display = "none";
-    };
+    // Switch between games
+    function showContainer(target) {
+      [clusterRushContainer, osuContainer, soundboardContainer, driftContainer].forEach(c => c.style.display = "none");
+      target.style.display = "block";
+    }
 
-    clusterBtn.onclick = () => {
-      osuContainer.style.display = "none";
-      soundboardContainer.style.display = "none";
-      driftContainer.style.display = "none";
-      clusterRushContainer.style.display = "block";
-      menu.style.display = "none";
-    };
+    osuBtn.onclick = () => { showContainer(osuContainer); uploadMenuControls.style.display = "none"; menu.style.display = "none"; };
+    clusterBtn.onclick = () => { showContainer(clusterRushContainer); uploadMenuControls.style.display = "none"; menu.style.display = "none"; };
+    driftBtn.onclick = () => { showContainer(driftContainer); uploadMenuControls.style.display = "none"; menu.style.display = "none"; };
+    soundboardBtn.onclick = () => { showContainer(soundboardContainer); uploadMenuControls.style.display = "block"; menu.style.display = "none"; loadSavedSounds(); };
 
-    soundboardBtn.onclick = () => {
-      clusterRushContainer.style.display = "none";
-      osuContainer.style.display = "none";
-      driftContainer.style.display = "none";
-      soundboardContainer.style.display = "block";
-      menu.style.display = "none";
-    };
-
-    driftBtn.onclick = () => {
-      clusterRushContainer.style.display = "none";
-      osuContainer.style.display = "none";
-      soundboardContainer.style.display = "none";
-      driftContainer.style.display = "block";
-      menu.style.display = "none";
-    };
-
-    // --- Open in New Tab button logic ---
+    // Open in new tab
     newTabBtn.onclick = () => {
       const isOsuVisible = osuContainer.style.display === "block";
       const isSoundboardVisible = soundboardContainer.style.display === "block";
@@ -199,17 +198,69 @@
           ? "https://kingnoobisw.github.io/soundboard2/"
           : isDriftVisible
             ? "https://kingnoobisw.github.io/drift-boss/"
-            : "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/index.html";
+            : "https://bubbls.github.io/clusterarchive/";
       window.open(url, "_blank", "width=1024,height=768");
     };
 
-    // --- Redirect key ---
-    document.addEventListener("keydown", function(event) {
-      if (event.key === ">") {
+    // Redirect key
+    document.addEventListener("keydown", e => {
+      if (e.key === ">") {
         const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
         window.location.href = link;
       }
     });
+
+    // --- SOUND UPLOAD & SAVE LOGIC ---
+    let uploadedBlob = null;
+
+    soundUpload.onchange = () => {
+      const file = soundUpload.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          uploadedBlob = e.target.result; // base64
+          alert("✅ Sound loaded! Now give it a name and click 'Save Sound'.");
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    saveSoundBtn.onclick = () => {
+      const name = soundName.value.trim() || "Unnamed Sound";
+      if (uploadedBlob) {
+        const sounds = JSON.parse(localStorage.getItem("savedSounds") || "[]");
+        sounds.push({ name, data: uploadedBlob });
+        localStorage.setItem("savedSounds", JSON.stringify(sounds));
+        uploadedBlob = null;
+        soundName.value = "";
+        soundUpload.value = "";
+        alert("🎵 Sound saved!");
+        loadSavedSounds();
+      } else {
+        alert("Please upload a sound first.");
+      }
+    };
+
+    function loadSavedSounds() {
+      savedSoundsDiv.innerHTML = "";
+      const sounds = JSON.parse(localStorage.getItem("savedSounds") || "[]");
+      if (sounds.length === 0) {
+        savedSoundsDiv.innerHTML = "<p>No sounds saved yet.</p>";
+        return;
+      }
+      sounds.forEach((s, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = `▶ ${s.name}`;
+        btn.onclick = () => {
+          const audio = new Audio(s.data);
+          audio.play();
+        };
+        savedSoundsDiv.appendChild(btn);
+      });
+    }
+
+    // Load sounds on page open
+    loadSavedSounds();
   </script>
 </body>
 </html>
