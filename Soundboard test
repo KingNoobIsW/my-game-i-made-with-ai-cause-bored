@@ -2,38 +2,31 @@
 <html lang="en-us">
 <head>
   <meta charset="utf-8">
-  <title>Cluster Rush + Web Osu Mania + Coolmath Games Menu</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Cluster Rush + Web Osu Mania Menu</title>
   <style>
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
-      height: 100vh;
       background: #111;
-      font-family: sans-serif;
       overflow: hidden;
+      font-family: sans-serif;
     }
-
-    iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
+    canvas, iframe {
+      display: block;
       width: 100vw;
       height: 100vh;
       border: none;
-      z-index: 0;
+      touch-action: none;
     }
-
-    /* --- Top corner dropdown menu --- */
     #topButtons {
       position: absolute;
       top: 10px;
       left: 10px;
-      z-index: 1000;
+      z-index: 10;
       display: flex;
       gap: 10px;
     }
-
-    #menuBtn {
+    #topButtons button {
       background: #333;
       color: #fff;
       border: none;
@@ -42,47 +35,67 @@
       cursor: pointer;
       font-weight: bold;
     }
-
     #menu {
       position: absolute;
-      top: 40px;
+      top: 45px;
       left: 10px;
-      z-index: 1000;
+      z-index: 10;
       background: #222;
       border: 1px solid #555;
       border-radius: 6px;
       padding: 10px;
       display: none;
     }
-
-    #menu input {
+    #menu input[type="text"] {
       width: 220px;
       padding: 4px;
       border-radius: 4px;
       border: 1px solid #555;
       background: #111;
       color: #fff;
-      margin-bottom: 6px;
     }
-
     #menu button {
-      display: block;
-      width: 100%;
       margin-top: 6px;
       background: #0f0;
       border: none;
       padding: 5px 12px;
       border-radius: 4px;
       cursor: pointer;
+      width: 100%;
       font-weight: bold;
+    }
+    #uploadMenuControls {
+      margin-top: 10px;
+      display: none;
+    }
+    #uploadMenuControls input[type="file"],
+    #uploadMenuControls button {
+      width: 100%;
+      margin-top: 6px;
+      padding: 6px;
+      border-radius: 4px;
+      border: none;
+      background: #0f0;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #uploadedMedia {
+      width: 100%;
+      margin-top: 6px;
+      display: none;
+      height: 0;
+    }
+    #clusterRushContainer, #osuContainer, #soundboardContainer, #driftContainer {
+      width: 100vw;
+      height: 100vh;
     }
   </style>
 </head>
-<body>
+<body class="template">
 
-  <!-- --- MENU BUTTON + DROPDOWN --- -->
   <div id="topButtons">
     <button id="menuBtn">☰ Menu</button>
+    <button id="newTabBtn">↗ Open in New Tab</button>
   </div>
 
   <div id="menu">
@@ -92,12 +105,33 @@
     <hr>
     <button id="osuBtn">🎵 Play Web Osu Mania</button>
     <button id="clusterBtn">🦖 Play Cluster Rush</button>
-    <button id="coolmathBtn">🧮 Play Coolmath Games</button>
-    <button id="openLinkBtn">➡ Go to Saved Link</button>
+    <button id="soundboardBtn">🔊 Play Soundboard</button>
+    <button id="driftBtn">🚗 Play Drift Boss</button>
+
+    <!-- Upload Sound or Video Controls -->
+    <div id="uploadMenuControls">
+      <label>Upload sound or video (.mp3, .wav, .mp4):</label>
+      <input type="file" id="mediaUpload" accept=".mp3, .wav, .mp4">
+      <button id="playMediaBtn">▶ Play Uploaded Audio</button>
+      <video id="uploadedMedia" controls></video>
+    </div>
   </div>
 
-  <!-- --- Iframe for games --- -->
-  <iframe id="gameFrame" src=""></iframe>
+  <div id="clusterRushContainer">
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+  </div>
+
+  <div id="osuContainer" style="display:none;">
+    <iframe id="osuFrame" src="https://hectickiwi.github.io/Web-Osu-Mania/" allow="fullscreen" allowfullscreen></iframe>
+  </div>
+
+  <div id="soundboardContainer" style="display:none;">
+    <iframe id="soundboardFrame" src="https://kingnoobisw.github.io/soundboard2/" allow="fullscreen" allowfullscreen></iframe>
+  </div>
+
+  <div id="driftContainer" style="display:none;">
+    <iframe id="driftFrame" src="https://kingnoobisw.github.io/drift-boss/" allow="fullscreen" allowfullscreen></iframe>
+  </div>
 
   <script>
     const menuBtn = document.getElementById("menuBtn");
@@ -106,14 +140,22 @@
     const saveBtn = document.getElementById("saveBtn");
     const osuBtn = document.getElementById("osuBtn");
     const clusterBtn = document.getElementById("clusterBtn");
-    const coolmathBtn = document.getElementById("coolmathBtn");
-    const openLinkBtn = document.getElementById("openLinkBtn");
-    const gameFrame = document.getElementById("gameFrame");
+    const soundboardBtn = document.getElementById("soundboardBtn");
+    const driftBtn = document.getElementById("driftBtn");
+    const newTabBtn = document.getElementById("newTabBtn");
 
-    // Load saved redirect link
+    const clusterRushContainer = document.getElementById("clusterRushContainer");
+    const osuContainer = document.getElementById("osuContainer");
+    const soundboardContainer = document.getElementById("soundboardContainer");
+    const driftContainer = document.getElementById("driftContainer");
+
+    const uploadMenuControls = document.getElementById("uploadMenuControls");
+    const mediaUpload = document.getElementById("mediaUpload");
+    const uploadedMedia = document.getElementById("uploadedMedia");
+    const playMediaBtn = document.getElementById("playMediaBtn");
+
     linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
 
-    // Toggle menu dropdown
     menuBtn.onclick = () => {
       menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
     };
@@ -122,40 +164,68 @@
       const link = linkInput.value.trim();
       if (link) {
         localStorage.setItem("redirectLink", link);
-        alert("✅ Link saved!");
+        alert("Link saved! Press '>' to go there.");
         menu.style.display = "none";
       }
     };
 
-    // Load games in the iframe
     osuBtn.onclick = () => {
-      gameFrame.src = "https://kingnoobisw.github.io/WebOsuMania/?v=" + new Date().getTime();
+      clusterRushContainer.style.display = "none";
+      soundboardContainer.style.display = "none";
+      driftContainer.style.display = "none";
+      osuContainer.style.display = "block";
+      uploadMenuControls.style.display = "none";
       menu.style.display = "none";
     };
 
     clusterBtn.onclick = () => {
-      gameFrame.src = "https://swordslasher.com/games/cluster-rush/game.html?v=" + new Date().getTime();
+      osuContainer.style.display = "none";
+      soundboardContainer.style.display = "none";
+      driftContainer.style.display = "none";
+      clusterRushContainer.style.display = "block";
+      uploadMenuControls.style.display = "none";
       menu.style.display = "none";
     };
 
-    coolmathBtn.onclick = () => {
-      gameFrame.src = "https://www.coolmathgames.com/?v=" + new Date().getTime();
+    soundboardBtn.onclick = () => {
+      clusterRushContainer.style.display = "none";
+      osuContainer.style.display = "none";
+      driftContainer.style.display = "none";
+      soundboardContainer.style.display = "block";
+      uploadMenuControls.style.display = "block";
       menu.style.display = "none";
     };
 
-    openLinkBtn.onclick = () => {
-      const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
-      gameFrame.src = link + "?v=" + new Date().getTime();
+    driftBtn.onclick = () => {
+      clusterRushContainer.style.display = "none";
+      osuContainer.style.display = "none";
+      soundboardContainer.style.display = "none";
+      driftContainer.style.display = "block";
+      uploadMenuControls.style.display = "none";
       menu.style.display = "none";
     };
 
-    // Redirect key
+    newTabBtn.onclick = () => {
+      const isOsuVisible = osuContainer.style.display === "block";
+      const isSoundboardVisible = soundboardContainer.style.display === "block";
+      const isDriftVisible = driftContainer.style.display === "block";
+      const url = isOsuVisible
+        ? "https://hectickiwi.github.io/Web-Osu-Mania/"
+        : isSoundboardVisible
+          ? "https://kingnoobisw.github.io/soundboard2/"
+          : isDriftVisible
+            ? "https://kingnoobisw.github.io/drift-boss/"
+            : "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/index.html";
+      window.open(url, "_blank", "width=1024,height=768");
+    };
+
     document.addEventListener("keydown", function(event) {
       if (event.key === ">") {
         const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
-        gameFrame.src = link + "?v=" + new Date().getTime();
+        window.location.href = link;
       }
     });
-  </script>
-</body>
-</html>
+
+    mediaUpload.onchange = () => {
+      const file = mediaUpload.files[0];
+      if (file)
