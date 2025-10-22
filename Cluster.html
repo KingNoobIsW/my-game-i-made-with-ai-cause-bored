@@ -63,7 +63,7 @@
       cursor: pointer;
       width: 100%;
     }
-    #clusterRushContainer, #osuContainer, #soundboardContainer {
+    #clusterRushContainer, #osuContainer, #soundboardContainer, #driftContainer {
       width: 100vw;
       height: 100vh;
     }
@@ -88,6 +88,7 @@
     <button id="osuBtn">🎵 Play Web Osu Mania</button>
     <button id="clusterBtn">🦖 Play Cluster Rush</button>
     <button id="soundboardBtn">🔊 Play Soundboard</button>
+    <button id="driftBtn">🚗 Play Drift Boss</button>
   </div>
 
   <!-- --- GAME CONTAINERS --- -->
@@ -101,6 +102,10 @@
 
   <div id="soundboardContainer" style="display:none;">
     <iframe id="soundboardFrame" src="https://kingnoobisw.github.io/soundboard2/" allow="fullscreen" allowfullscreen></iframe>
+  </div>
+
+  <div id="driftContainer" style="display:none;">
+    <iframe id="driftFrame" src="https://kingnoobisw.github.io/drift-boss/" allow="fullscreen" allowfullscreen></iframe>
   </div>
 
   <script>
@@ -126,11 +131,13 @@
     const osuBtn = document.getElementById("osuBtn");
     const clusterBtn = document.getElementById("clusterBtn");
     const soundboardBtn = document.getElementById("soundboardBtn");
+    const driftBtn = document.getElementById("driftBtn");
     const newTabBtn = document.getElementById("newTabBtn");
 
     const clusterRushContainer = document.getElementById("clusterRushContainer");
     const osuContainer = document.getElementById("osuContainer");
     const soundboardContainer = document.getElementById("soundboardContainer");
+    const driftContainer = document.getElementById("driftContainer");
 
     // load saved link
     linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
@@ -152,6 +159,7 @@
     osuBtn.onclick = () => {
       clusterRushContainer.style.display = "none";
       soundboardContainer.style.display = "none";
+      driftContainer.style.display = "none";
       osuContainer.style.display = "block";
       menu.style.display = "none";
     };
@@ -159,6 +167,7 @@
     clusterBtn.onclick = () => {
       osuContainer.style.display = "none";
       soundboardContainer.style.display = "none";
+      driftContainer.style.display = "none";
       clusterRushContainer.style.display = "block";
       menu.style.display = "none";
     };
@@ -166,7 +175,16 @@
     soundboardBtn.onclick = () => {
       clusterRushContainer.style.display = "none";
       osuContainer.style.display = "none";
+      driftContainer.style.display = "none";
       soundboardContainer.style.display = "block";
+      menu.style.display = "none";
+    };
+
+    driftBtn.onclick = () => {
+      clusterRushContainer.style.display = "none";
+      osuContainer.style.display = "none";
+      soundboardContainer.style.display = "none";
+      driftContainer.style.display = "block";
       menu.style.display = "none";
     };
 
@@ -174,11 +192,14 @@
     newTabBtn.onclick = () => {
       const isOsuVisible = osuContainer.style.display === "block";
       const isSoundboardVisible = soundboardContainer.style.display === "block";
+      const isDriftVisible = driftContainer.style.display === "block";
       const url = isOsuVisible
         ? "https://hectickiwi.github.io/Web-Osu-Mania/"
         : isSoundboardVisible
           ? "https://kingnoobisw.github.io/soundboard2/"
-          : "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/index.html";
+          : isDriftVisible
+            ? "https://kingnoobisw.github.io/drift-boss/"
+            : "https://cdn.jsdelivr.net/gh/bubbls/clusterarchive/index.html";
       window.open(url, "_blank", "width=1024,height=768");
     };
 
