@@ -46,7 +46,7 @@
       padding: 10px;
       display: none;
     }
-    #menu input[type="text"] {
+    #menu input {
       width: 220px;
       padding: 4px;
       border-radius: 4px;
@@ -62,13 +62,12 @@
       border-radius: 4px;
       cursor: pointer;
       width: 100%;
-      font-weight: bold;
     }
     #uploadMenuControls {
       margin-top: 10px;
       display: none;
     }
-    #uploadMenuControls input[type="file"],
+    #uploadMenuControls input,
     #uploadMenuControls button {
       width: 100%;
       margin-top: 6px;
@@ -79,11 +78,9 @@
       font-weight: bold;
       cursor: pointer;
     }
-    #uploadedMedia {
+    #uploadedAudio {
       width: 100%;
       margin-top: 6px;
-      display: none;
-      height: 0;
     }
     #clusterRushContainer, #osuContainer, #soundboardContainer, #driftContainer {
       width: 100vw;
@@ -108,12 +105,11 @@
     <button id="soundboardBtn">🔊 Play Soundboard</button>
     <button id="driftBtn">🚗 Play Drift Boss</button>
 
-    <!-- Upload Sound or Video Controls -->
+    <!-- Upload Sound Controls (only for Soundboard) -->
     <div id="uploadMenuControls">
-      <label>Upload sound or video (.mp3, .wav, .mp4):</label>
-      <input type="file" id="mediaUpload" accept=".mp3, .wav, .mp4">
-      <button id="playMediaBtn">▶ Play Uploaded Audio</button>
-      <video id="uploadedMedia" controls></video>
+      <input type="file" id="soundUpload" accept=".mp3, .wav">
+      <button onclick="playUploadedSound()">▶ Play Uploaded Sound</button>
+      <audio id="uploadedAudio" controls style="display:none;"></audio>
     </div>
   </div>
 
@@ -150,9 +146,8 @@
     const driftContainer = document.getElementById("driftContainer");
 
     const uploadMenuControls = document.getElementById("uploadMenuControls");
-    const mediaUpload = document.getElementById("mediaUpload");
-    const uploadedMedia = document.getElementById("uploadedMedia");
-    const playMediaBtn = document.getElementById("playMediaBtn");
+    const soundUpload = document.getElementById("soundUpload");
+    const uploadedAudio = document.getElementById("uploadedAudio");
 
     linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
 
@@ -226,6 +221,20 @@
       }
     });
 
-    mediaUpload.onchange = () => {
-      const file = mediaUpload.files[0];
-      if (file)
+    soundUpload.onchange = () => {
+      const file = soundUpload.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        uploadedAudio.src = url;
+        uploadedAudio.style.display = "block";
+      }
+    };
+
+    function playUploadedSound() {
+      if (uploadedAudio.src) {
+        uploadedAudio.play();
+      }
+    }
+  </script>
+</body>
+</html>
