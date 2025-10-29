@@ -109,6 +109,7 @@
       overflow-y: auto;
       height: 100vh;
       box-sizing: border-box;
+      background: linear-gradient(180deg,#0b0b0b, #111);
     }
     #soundboardMessage {
       background: #222;
@@ -141,6 +142,7 @@
     <button id="clusterBtn">🦖 Play Cluster Rush</button>
     <button id="soundboardBtn">🔊 Soundboard</button>
     <button id="driftBtn">🚗 Drift Boss</button>
+    <button id="polyBtn">🎚️ polyTrack</button>
 
     <!-- Soundboard Upload -->
     <div id="uploadMenuControls">
@@ -169,6 +171,10 @@
     <iframe src="https://kingnoobisw.github.io/drift-boss/" allowfullscreen></iframe>
   </div>
 
+  <div id="polyContainer" style="display:none;">
+    <iframe src="https://joe-the-chicken.github.io/polytrack/" allowfullscreen></iframe>
+  </div>
+
   <script>
     // --- Menu setup ---
     const menuBtn = document.getElementById("menuBtn");
@@ -179,12 +185,14 @@
     const clusterBtn = document.getElementById("clusterBtn");
     const soundboardBtn = document.getElementById("soundboardBtn");
     const driftBtn = document.getElementById("driftBtn");
+    const polyBtn = document.getElementById("polyBtn");
     const newTabBtn = document.getElementById("newTabBtn");
 
     const clusterRushContainer = document.getElementById("clusterRushContainer");
     const osuContainer = document.getElementById("osuContainer");
     const soundboardContainer = document.getElementById("soundboardContainer");
     const driftContainer = document.getElementById("driftContainer");
+    const polyContainer = document.getElementById("polyContainer");
 
     const uploadMenuControls = document.getElementById("uploadMenuControls");
     const soundUpload = document.getElementById("soundUpload");
@@ -211,7 +219,7 @@
 
     // --- Show containers ---
     function showContainer(target) {
-      [clusterRushContainer, osuContainer, soundboardContainer, driftContainer].forEach(c => c.style.display = "none");
+      [clusterRushContainer, osuContainer, soundboardContainer, driftContainer, polyContainer].forEach(c => c.style.display = "none");
       target.style.display = "block";
     }
 
@@ -219,19 +227,23 @@
     clusterBtn.onclick = () => { showContainer(clusterRushContainer); uploadMenuControls.style.display = "none"; menu.style.display = "none"; };
     driftBtn.onclick = () => { showContainer(driftContainer); uploadMenuControls.style.display = "none"; menu.style.display = "none"; };
     soundboardBtn.onclick = () => { showContainer(soundboardContainer); uploadMenuControls.style.display = "block"; menu.style.display = "none"; loadSavedSounds(); };
+    polyBtn.onclick = () => { showContainer(polyContainer); uploadMenuControls.style.display = "none"; menu.style.display = "none"; };
 
     // --- Open in New Tab ---
     newTabBtn.onclick = () => {
       const isOsuVisible = osuContainer.style.display === "block";
       const isSoundboardVisible = soundboardContainer.style.display === "block";
       const isDriftVisible = driftContainer.style.display === "block";
+      const isPolyVisible = polyContainer.style.display === "block";
       const url = isOsuVisible
         ? "https://hectickiwi.github.io/Web-Osu-Mania/"
         : isSoundboardVisible
           ? "https://kingnoobisw.github.io/soundboard2/"
           : isDriftVisible
             ? "https://kingnoobisw.github.io/drift-boss/"
-            : "https://bubbls.github.io/clusterarchive/";
+            : isPolyVisible
+              ? "https://joe-the-chicken.github.io/polytrack/"
+              : "https://bubbls.github.io/clusterarchive/";
       window.open(url, "_blank", "width=1024,height=768");
     };
 
