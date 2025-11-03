@@ -1,323 +1,437 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Cluster Rush + Web Osu Mania + Soundboard</title>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Cluster Rush + Web Osu Mania + Soundboard + polyTrack + Manga + EaglerCraft + Random Pages + Another Game + Obamify</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body {
-      margin: 0;
-      background: #111;
-      overflow: hidden;
-      font-family: sans-serif;
-      color: #fff;
-    }
-    canvas, iframe {
-      display: block;
-      width: 100vw;
-      height: 100vh;
-      border: none;
-      touch-action: none;
-    }
-    #topButtons {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 10;
-      display: flex;
-      gap: 10px;
-    }
-    #topButtons button {
-      background: #333;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 10px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    #menu {
-      position: absolute;
-      top: 45px;
-      left: 10px;
-      z-index: 10;
-      background: #222;
-      border: 1px solid #555;
-      border-radius: 6px;
-      padding: 10px;
-      display: none;
-      width: 260px;
-    }
-    #menu input {
-      width: 100%;
-      padding: 4px;
-      border-radius: 4px;
-      border: 1px solid #555;
-      background: #111;
-      color: #fff;
-    }
-    #menu button {
-      margin-top: 6px;
-      background: #0f0;
-      border: none;
-      padding: 5px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      width: 100%;
-    }
-    #uploadMenuControls {
-      margin-top: 10px;
-      display: none;
-    }
-    #uploadMenuControls input,
-    #uploadMenuControls button {
-      width: 100%;
-      margin-top: 6px;
-      padding: 6px;
-      border-radius: 4px;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    #savedSounds button {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #333;
-      color: #fff;
-      width: 100%;
-      border: none;
-      border-radius: 4px;
-      padding: 6px 8px;
-      margin-top: 4px;
-      cursor: pointer;
-    }
-    .deleteBtn {
-      background: red;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 4px 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .deleteBtn:hover {
-      background: darkred;
-    }
-    #soundboardContainer {
-      padding: 20px;
-      overflow-y: auto;
-      height: 100vh;
-      box-sizing: border-box;
-      background: linear-gradient(180deg,#0b0b0b, #111);
-    }
-    #soundboardMessage {
-      background: #222;
-      border: 1px solid #444;
-      border-radius: 8px;
-      padding: 10px 15px;
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 16px;
-      color: #0f0;
-      box-shadow: 0 0 8px #0f04;
-    }
+    :root{--bg:#111;--panel:#1a1a1a;--muted:#ccc;--accent:#0f0;--card:#151515}
+    html,body{height:100%;margin:0;background:var(--bg);color:#fff;font-family:Inter,Segoe UI,system-ui,Arial,sans-serif;overflow:hidden}
+    canvas,iframe{display:block;width:100vw;height:100vh;border:0}
+    #topButtons{position:absolute;top:10px;left:10px;z-index:60;display:flex;gap:8px}
+    #topButtons button{background:#333;color:#fff;border:0;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:700}
+    #menu{position:absolute;top:45px;left:10px;z-index:60;width:300px;background:var(--panel);border:1px solid #444;border-radius:6px;padding:10px;display:none}
+    #menu input{width:100%;padding:6px;border-radius:4px;border:1px solid #444;background:#0b0b0b;color:#fff;box-sizing:border-box}
+    #menu button{margin-top:6px;background:var(--accent);border:0;padding:6px;border-radius:6px;cursor:pointer;width:100%}
+    #uploadMenuControls{margin-top:8px;display:none}
+    #uploadMenuControls input,#uploadMenuControls button{width:100%;margin-top:6px;padding:6px;border-radius:6px;border:0;cursor:pointer}
+    #savedSounds button{display:flex;justify-content:space-between;align-items:center;background:#222;color:#fff;width:100%;border:0;border-radius:6px;padding:8px;margin-top:6px;cursor:pointer}
+    .deleteBtn{background:#c33;color:#fff;border:0;border-radius:6px;padding:6px 8px;cursor:pointer;font-weight:700}
+    .deleteBtn:hover{background:#a00}
+    .embeddedContainer{position:relative;width:100vw;height:100vh;background:#000;display:none}
+    .embeddedContainer iframe{background:#000}
+    .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:70;pointer-events:none}
+    .card{pointer-events:auto;background:var(--card);border:1px solid #333;color:#fff;padding:12px 14px;border-radius:8px;text-align:left;max-width:560px;box-shadow:0 6px 18px rgba(0,0,0,0.6)}
+    .card h3{margin:0 0 6px 0;font-size:16px}
+    .card p{margin:0 0 8px 0;color:var(--muted);font-size:13px}
+    .servers{font-family:monospace;color:#9fe5c9;font-size:13px;line-height:1.35}
+    .row{display:flex;gap:8px;justify-content:center;margin-top:8px}
+    .btn{background:var(--accent);color:#000;border:0;padding:7px 10px;border-radius:6px;cursor:pointer;font-weight:700}
+    .btn.secondary{background:#666;color:#fff}
+    .smallNote{font-size:12px;color:#bbb;margin-top:6px}
+    /* ensure cluster visible by default */
+    #clusterRushContainer{display:block}
+    /* Random Pages controls */
+    .rp-controls{position:absolute;left:12px;bottom:12px;z-index:80;background:rgba(0,0,0,0.6);padding:8px;border-radius:8px;border:1px solid #222;font-family:sans-serif}
+    .rp-controls button{background:#0f0;color:#000;border:0;padding:6px 8px;border-radius:6px;margin-right:6px;cursor:pointer;font-weight:700}
+    .rp-controls .secondary{background:#666;color:#fff}
+    .rp-info{font-size:12px;color:#ddd;margin-bottom:6px}
   </style>
 </head>
-<body class="template">
-
-  <!-- Top buttons -->
+<body>
   <div id="topButtons">
     <button id="menuBtn">☰ Menu</button>
     <button id="newTabBtn">↗ Open in New Tab</button>
   </div>
 
-  <!-- Dropdown Menu -->
   <div id="menu">
     <label>Redirect link:</label><br>
-    <input type="text" id="linkInput" placeholder="https://example.com"><br>
+    <input id="linkInput" placeholder="https://example.com" />
     <button id="saveBtn">Save Link</button>
-    <hr>
-    <button id="osuBtn">🎵 Play Web Osu Mania</button>
-    <button id="clusterBtn">🦖 Play Cluster Rush</button>
+    <hr style="border:0;border-top:1px solid #333;margin:8px 0">
+
+    <button id="randomPagesBtn">🎲 Random Pages</button>
+    <button id="anotherBtn">🎯 another game</button>
+    <button id="obamifyBtn">🎤 Obamify</button>
+    <button id="osuBtn">🎵 Web Osu Mania</button>
+    <button id="clusterBtn">🦖 Cluster Rush</button>
     <button id="soundboardBtn">🔊 Soundboard</button>
     <button id="driftBtn">🚗 Drift Boss</button>
     <button id="polyBtn">🎚️ polyTrack</button>
+    <button id="mangaBtn">📚 Manga</button>
+    <button id="eaglerBtn">🛡️ EaglerCraft</button>
 
-    <!-- Soundboard Upload -->
     <div id="uploadMenuControls">
-      <input type="file" id="soundUpload" accept=".mp3, .wav">
+      <input type="file" id="soundUpload" accept=".mp3,.wav">
       <input type="text" id="soundName" placeholder="Enter sound name">
       <button id="saveSoundBtn">💾 Save Sound</button>
     </div>
   </div>
 
-  <!-- Game Containers -->
-  <div id="clusterRushContainer">
-    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+  <!-- Main containers -->
+  <div id="clusterRushContainer"><canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas></div>
+
+  <!-- Random Pages container -->
+  <div id="randomPagesContainer" class="embeddedContainer" style="display:none">
+    <iframe id="randomPagesIframe" src="about:blank" allowfullscreen></iframe>
+    <div class="rp-controls">
+      <div class="rp-info" id="rpInfo">Random Pages — click Open Random or Next</div>
+      <div>
+        <button id="rpOpenBtn">Open Random</button>
+        <button id="rpNextBtn" class="secondary">Next</button>
+        <button id="rpOpenNewBtn" class="secondary">Open in New Tab</button>
+      </div>
+    </div>
   </div>
 
-  <div id="osuContainer" style="display:none;">
-    <iframe src="https://hectickiwi.github.io/Web-Osu-Mania/" allowfullscreen></iframe>
+  <!-- Another game container (overlay-first; iframe kept blank) -->
+  <div id="anotherContainer" class="embeddedContainer" style="display:none">
+    <iframe id="anotherIframe" src="about:blank" allowfullscreen></iframe>
+    <div id="anotherOverlay" class="overlay" style="display:flex">
+      <div class="card" role="dialog" aria-labelledby="anotherTitle">
+        <h3 id="anotherTitle">🎯 another game</h3>
+        <p>This preview will not run the site here. Open in new page to continue to the full experience.</p>
+        <div class="smallNote">(embedding may be blocked by the site; opening in a new tab always works)</div>
+        <div style="margin-top:8px;display:flex;gap:8px;justify-content:center">
+          <button id="anotherContinueBtn" class="btn">Continue in New Page</button>
+          <button id="anotherCloseBtn" class="btn secondary">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div id="soundboardContainer" style="display:none;">
-    <div id="soundboardMessage">💡 Click on <b>Menu</b> to upload sounds and <b>Open in New Tab</b> to see premades!</div>
-    <h2>🎧 Custom Soundboard</h2>
-    <div id="savedSounds"></div>
+  <!-- Obamify container (overlay-first; iframe kept blank) -->
+  <div id="obamifyContainer" class="embeddedContainer" style="display:none">
+    <iframe id="obamifyIframe" src="about:blank" allowfullscreen></iframe>
+    <div id="obamifyOverlay" class="overlay" style="display:flex">
+      <div class="card" role="dialog" aria-labelledby="obamifyTitle">
+        <h3 id="obamifyTitle">🎤 Obamify</h3>
+        <p>This preview will not run the site here. Open in new page to continue to the full experience.</p>
+        <div class="smallNote">(embedding may be blocked by the site; opening in a new tab always works)</div>
+        <div class="row">
+          <button id="obamifyContinueBtn" class="btn">Continue in New Page</button>
+          <button id="obamifyCloseBtn" class="btn secondary">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div id="driftContainer" style="display:none;">
-    <iframe src="https://kingnoobisw.github.io/drift-boss/" allowfullscreen></iframe>
+  <div id="osuContainer" class="embeddedContainer" style="display:none"><iframe src="https://hectickiwi.github.io/Web-Osu-Mania/" allowfullscreen></iframe></div>
+
+  <div id="soundboardContainer" class="embeddedContainer" style="display:none">
+    <div style="padding:18px;color:var(--accent)">💡 Click on <b>Menu</b> to upload sounds and <b>Open in New Tab</b> to see premades!</div>
+    <div style="padding:0 18px"><h3 style="margin:0 0 8px 0">🎧 Custom Soundboard</h3><div id="savedSounds"></div></div>
   </div>
 
-  <div id="polyContainer" style="display:none;">
-    <iframe src="https://joe-the-chicken.github.io/polytrack/" allowfullscreen></iframe>
+  <div id="driftContainer" class="embeddedContainer" style="display:none"><iframe src="https://kingnoobisw.github.io/drift-boss/" allowfullscreen></iframe></div>
+
+  <div id="polyContainer" class="embeddedContainer" style="display:none"><iframe src="https://joe-the-chicken.github.io/polytrack/" allowfullscreen></iframe></div>
+
+  <div id="mangaContainer" class="embeddedContainer" style="display:none">
+    <iframe id="mangaIframe" src="https://drive.google.com/drive/folders/1mO1oxjDmRcY3il-mj7859pm4g38RuAFC" allowfullscreen></iframe>
+    <div id="mangaOverlay" class="overlay" style="display:flex">
+      <div class="card" role="dialog" aria-labelledby="mangaTitle">
+        <h3 id="mangaTitle">📚 Manga</h3>
+        <p>Open in new tab to work</p>
+        <div class="row">
+          <button id="mangaContinueBtn" class="btn">Open</button>
+          <button id="mangaCloseBtn" class="btn secondary">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EaglerCraft: iframe blank so game does not run in this tab; overlay lists servers compactly -->
+  <div id="eaglerContainer" class="embeddedContainer" style="display:none">
+    <iframe id="eaglerIframe" src="about:blank" allowfullscreen></iframe>
+    <div id="eaglerOverlay" class="overlay" style="display:flex">
+      <div class="card" role="dialog" aria-labelledby="eaglerTitle">
+        <h3 id="eaglerTitle">🛡️ EaglerCraft</h3>
+        <p style="margin-bottom:6px">This preview will not run the game here. Open in new page to run the full client.</p>
+        <div class="smallNote">(loads slowly at start, be patient)</div>
+        <div class="servers" aria-live="polite" style="margin-top:8px">
+          ArchMC - wss://mc.arch.lol
+          <br>PostClue - wss://play.craftclue.rocks
+          <br>Legxnd SMP - wss://legxndsmp.minecraft.pe
+          <br>Zentic - wss://zentic.cc
+          <br>Asspixel - wss://mc.asspixel.net/
+          <br>Ayunboom - wss://sus.shhnowisnottheti.me
+          <br>Aeon Network - wss://aeon-network.net/1.8
+          <br>Aeon Pitfall - wss://us.aeon-network.net/1.8
+          <br>MercuryMC - wss://mercurymc.net
+          <br>eaglerx-server.atticussprague.repl.co/server
+        </div>
+        <div class="row">
+          <button id="eaglerContinueBtn" class="btn">Continue in New Page</button>
+          <button id="eaglerCloseBtn" class="btn secondary">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    // --- Menu setup ---
-    const menuBtn = document.getElementById("menuBtn");
-    const menu = document.getElementById("menu");
-    const linkInput = document.getElementById("linkInput");
-    const saveBtn = document.getElementById("saveBtn");
-    const osuBtn = document.getElementById("osuBtn");
-    const clusterBtn = document.getElementById("clusterBtn");
-    const soundboardBtn = document.getElementById("soundboardBtn");
-    const driftBtn = document.getElementById("driftBtn");
-    const polyBtn = document.getElementById("polyBtn");
-    const newTabBtn = document.getElementById("newTabBtn");
+    // --- Cached elements ---
+    const menuBtn = document.getElementById('menuBtn'), menu = document.getElementById('menu');
+    const linkInput = document.getElementById('linkInput'), saveBtn = document.getElementById('saveBtn');
+    const randomPagesBtn = document.getElementById('randomPagesBtn'), anotherBtn = document.getElementById('anotherBtn');
+    const obamifyBtn = document.getElementById('obamifyBtn');
+    const osuBtn = document.getElementById('osuBtn'), clusterBtn = document.getElementById('clusterBtn');
+    const soundboardBtn = document.getElementById('soundboardBtn'), driftBtn = document.getElementById('driftBtn');
+    const polyBtn = document.getElementById('polyBtn'), mangaBtn = document.getElementById('mangaBtn');
+    const eaglerBtn = document.getElementById('eaglerBtn'), newTabBtn = document.getElementById('newTabBtn');
 
-    const clusterRushContainer = document.getElementById("clusterRushContainer");
-    const osuContainer = document.getElementById("osuContainer");
-    const soundboardContainer = document.getElementById("soundboardContainer");
-    const driftContainer = document.getElementById("driftContainer");
-    const polyContainer = document.getElementById("polyContainer");
+    const clusterRushContainer = document.getElementById('clusterRushContainer');
+    const randomPagesContainer = document.getElementById('randomPagesContainer');
+    const randomPagesIframe = document.getElementById('randomPagesIframe');
+    const anotherContainer = document.getElementById('anotherContainer');
+    const anotherIframe = document.getElementById('anotherIframe');
+    const obamifyContainer = document.getElementById('obamifyContainer');
+    const obamifyIframe = document.getElementById('obamifyIframe');
+    const osuContainer = document.getElementById('osuContainer');
+    const soundboardContainer = document.getElementById('soundboardContainer');
+    const driftContainer = document.getElementById('driftContainer');
+    const polyContainer = document.getElementById('polyContainer');
+    const mangaContainer = document.getElementById('mangaContainer');
+    const eaglerContainer = document.getElementById('eaglerContainer');
 
-    const uploadMenuControls = document.getElementById("uploadMenuControls");
-    const soundUpload = document.getElementById("soundUpload");
-    const soundName = document.getElementById("soundName");
-    const saveSoundBtn = document.getElementById("saveSoundBtn");
-    const savedSoundsDiv = document.getElementById("savedSounds");
+    const uploadMenuControls = document.getElementById('uploadMenuControls');
+    const soundUpload = document.getElementById('soundUpload'), soundName = document.getElementById('soundName'), saveSoundBtn = document.getElementById('saveSoundBtn');
+    const savedSoundsDiv = document.getElementById('savedSounds');
 
-    linkInput.value = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
+    const rpOpenBtn = document.getElementById('rpOpenBtn'), rpNextBtn = document.getElementById('rpNextBtn'), rpOpenNewBtn = document.getElementById('rpOpenNewBtn');
+    const rpInfo = document.getElementById('rpInfo');
+
+    const anotherOverlay = document.getElementById('anotherOverlay'), anotherContinueBtn = document.getElementById('anotherContinueBtn'), anotherCloseBtn = document.getElementById('anotherCloseBtn');
+    const obamifyOverlay = document.getElementById('obamifyOverlay'), obamifyContinueBtn = document.getElementById('obamifyContinueBtn'), obamifyCloseBtn = document.getElementById('obamifyCloseBtn');
+
+    const mangaOverlay = document.getElementById('mangaOverlay'), mangaContinueBtn = document.getElementById('mangaContinueBtn'), mangaCloseBtn = document.getElementById('mangaCloseBtn');
+    const eaglerOverlay = document.getElementById('eaglerOverlay'), eaglerContinueBtn = document.getElementById('eaglerContinueBtn'), eaglerCloseBtn = document.getElementById('eaglerCloseBtn');
+    const eaglerIframe = document.getElementById('eaglerIframe');
+
+    // --- Random Pages links ---
+    const randomPages = [
+      "https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/preview?tab=t.0",
+      "https://drive.google.com/drive/folders/1ou3mI5xJVQv8Vt_MvwejPtf7zStSnU-s",
+      "about:blank"
+    ];
+    let rpIndex = 0;
+
+    // --- Another game URL ---
+    const anotherURL = "https://sites.google.com/busd.net/test/home?read_current=1";
+
+    // --- Obamify URL ---
+    const obamifyURL = "https://obamify.com/";
+
+    // --- Defaults ---
+    linkInput.value = localStorage.getItem('redirectLink') || 'https://classroom.google.com/h';
 
     // --- Menu toggle ---
-    menuBtn.onclick = () => {
-      menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
-    };
+    menuBtn.onclick = () => menu.style.display = (menu.style.display==='none' || menu.style.display==='') ? 'block' : 'none';
 
     // --- Save redirect link ---
     saveBtn.onclick = () => {
-      const link = linkInput.value.trim();
-      if (link) {
-        localStorage.setItem("redirectLink", link);
-        alert("✅ Link saved! Press '>' to go there.");
-        menu.style.display = "none";
-      }
+      const v = linkInput.value.trim();
+      if (v) { localStorage.setItem('redirectLink', v); alert('✅ Link saved! Press \'>\' to go there.'); menu.style.display = 'none'; }
     };
 
-    // --- Show containers ---
+    // --- Show containers helper ---
     function showContainer(target) {
-      [clusterRushContainer, osuContainer, soundboardContainer, driftContainer, polyContainer].forEach(c => c.style.display = "none");
-      target.style.display = "block";
+      [clusterRushContainer, randomPagesContainer, anotherContainer, obamifyContainer, osuContainer, soundboardContainer, driftContainer, polyContainer, mangaContainer, eaglerContainer].forEach(c => c.style.display = 'none');
+      target.style.display = 'block';
     }
 
-    osuBtn.onclick = () => { showContainer(osuContainer); uploadMenuControls.style.display = "none"; menu.style.display = "none"; };
-    clusterBtn.onclick = () => { showContainer(clusterRushContainer); uploadMenuControls.style.display = "none"; menu.style.display = "none"; };
-    driftBtn.onclick = () => { showContainer(driftContainer); uploadMenuControls.style.display = "none"; menu.style.display = "none"; };
-    soundboardBtn.onclick = () => { showContainer(soundboardContainer); uploadMenuControls.style.display = "block"; menu.style.display = "none"; loadSavedSounds(); };
-    polyBtn.onclick = () => { showContainer(polyContainer); uploadMenuControls.style.display = "none"; menu.style.display = "none"; };
+    // --- Menu navigation ---
+    randomPagesBtn.onclick = () => {
+      showContainer(randomPagesContainer);
+      uploadMenuControls.style.display = 'none';
+      menu.style.display = 'none';
+      randomPagesIframe.src = randomPages[rpIndex] || "about:blank";
+      rpInfo.textContent = `Random Pages — current ${rpIndex+1}/${randomPages.length}`;
+    };
 
-    // --- Open in New Tab ---
-    newTabBtn.onclick = () => {
-      const isOsuVisible = osuContainer.style.display === "block";
-      const isSoundboardVisible = soundboardContainer.style.display === "block";
-      const isDriftVisible = driftContainer.style.display === "block";
-      const isPolyVisible = polyContainer.style.display === "block";
-      const url = isOsuVisible
-        ? "https://hectickiwi.github.io/Web-Osu-Mania/"
-        : isSoundboardVisible
-          ? "https://kingnoobisw.github.io/soundboard2/"
-          : isDriftVisible
-            ? "https://kingnoobisw.github.io/drift-boss/"
-            : isPolyVisible
-              ? "https://joe-the-chicken.github.io/polytrack/"
-              : "https://bubbls.github.io/clusterarchive/";
+    anotherBtn.onclick = () => {
+      showContainer(anotherContainer);
+      uploadMenuControls.style.display = 'none';
+      menu.style.display = 'none';
+      if (anotherOverlay) anotherOverlay.style.display = 'flex';
+      if (anotherIframe) anotherIframe.src = "about:blank";
+    };
+
+    obamifyBtn.onclick = () => {
+      showContainer(obamifyContainer);
+      uploadMenuControls.style.display = 'none';
+      menu.style.display = 'none';
+      if (obamifyOverlay) obamifyOverlay.style.display = 'flex';
+      if (obamifyIframe) obamifyIframe.src = "about:blank";
+    };
+
+    osuBtn.onclick = () => { showContainer(osuContainer); uploadMenuControls.style.display = 'none'; menu.style.display = 'none'; };
+    clusterBtn.onclick = () => { showContainer(clusterRushContainer); uploadMenuControls.style.display = 'none'; menu.style.display = 'none'; };
+    driftBtn.onclick = () => { showContainer(driftContainer); uploadMenuControls.style.display = 'none'; menu.style.display = 'none'; };
+    soundboardBtn.onclick = () => { showContainer(soundboardContainer); uploadMenuControls.style.display = 'block'; menu.style.display = 'none'; loadSavedSounds(); };
+    polyBtn.onclick = () => { showContainer(polyContainer); uploadMenuControls.style.display = 'none'; menu.style.display = 'none'; };
+    mangaBtn.onclick = () => { showContainer(mangaContainer); uploadMenuControls.style.display = 'none'; menu.style.display = 'none'; if (mangaOverlay) mangaOverlay.style.display = 'flex'; };
+    eaglerBtn.onclick = () => {
+      showContainer(eaglerContainer);
+      uploadMenuControls.style.display = 'none';
+      menu.style.display = 'none';
+      if (eaglerOverlay) eaglerOverlay.style.display = 'flex';
+      if (eaglerIframe) eaglerIframe.src = 'about:blank';
+    };
+
+    // --- Random Pages controls ---
+    rpOpenBtn.onclick = () => {
+      rpIndex = Math.floor(Math.random() * randomPages.length);
+      randomPagesIframe.src = randomPages[rpIndex] || "about:blank";
+      rpInfo.textContent = `Random Pages — current ${rpIndex+1}/${randomPages.length}`;
+    };
+    rpNextBtn.onclick = () => {
+      rpIndex = (rpIndex + 1) % randomPages.length;
+      randomPagesIframe.src = randomPages[rpIndex] || "about:blank";
+      rpInfo.textContent = `Random Pages — current ${rpIndex+1}/${randomPages.length}`;
+    };
+    rpOpenNewBtn.onclick = () => {
+      const url = randomPages[rpIndex] || window.location.href;
       window.open(url, "_blank", "width=1024,height=768");
     };
 
+    // --- Another game overlay actions ---
+    anotherContinueBtn.onclick = () => {
+      window.open(anotherURL, "_blank", "width=1024,height=768");
+    };
+    anotherCloseBtn.onclick = () => {
+      if (anotherOverlay) anotherOverlay.style.display = 'none';
+    };
+
+    // --- Obamify overlay actions ---
+    obamifyContinueBtn.onclick = () => {
+      window.open(obamifyURL, "_blank", "width=1024,height=768");
+    };
+    obamifyCloseBtn.onclick = () => {
+      if (obamifyOverlay) obamifyOverlay.style.display = 'none';
+    };
+
+    // --- Open in New Tab (top right) ---
+    newTabBtn.onclick = () => {
+      const isRandomVisible = randomPagesContainer.style.display === 'block';
+      const isAnotherVisible = anotherContainer.style.display === 'block';
+      const isObamifyVisible = obamifyContainer.style.display === 'block';
+      const isOsuVisible = osuContainer.style.display === 'block';
+      const isSoundboardVisible = soundboardContainer.style.display === 'block';
+      const isDriftVisible = driftContainer.style.display === 'block';
+      const isPolyVisible = polyContainer.style.display === 'block';
+      const isMangaVisible = mangaContainer.style.display === 'block';
+      const isEaglerVisible = eaglerContainer.style.display === 'block';
+      const url = isRandomVisible
+        ? (randomPages[rpIndex] || window.location.href)
+        : isAnotherVisible
+          ? anotherURL
+          : isObamifyVisible
+            ? obamifyURL
+            : isOsuVisible
+              ? 'https://hectickiwi.github.io/Web-Osu-Mania/'
+              : isSoundboardVisible
+                ? 'https://kingnoobisw.github.io/soundboard2/'
+                : isDriftVisible
+                  ? 'https://kingnoobisw.github.io/drift-boss/'
+                  : isPolyVisible
+                    ? 'https://joe-the-chicken.github.io/polytrack/'
+                    : isMangaVisible
+                      ? 'https://drive.google.com/drive/folders/1mO1oxjDmRcY3il-mj7859pm4g38RuAFC'
+                      : isEaglerVisible
+                        ? 'https://kingnoobisw.github.io/eaglercraft/'
+                        : 'https://bubbls.github.io/clusterarchive/';
+      window.open(url, '_blank', 'width=1024,height=768');
+    };
+
+    // --- Manga overlay buttons ---
+    if (mangaContinueBtn) mangaContinueBtn.onclick = () => { window.open('https://drive.google.com/drive/folders/1mO1oxjDmRcY3il-mj7859pm4g38RuAFC', '_blank', 'width=1024,height=768'); };
+    if (mangaCloseBtn) mangaCloseBtn.onclick = () => { if (mangaOverlay) mangaOverlay.style.display = 'none'; };
+
+    // --- Eagler overlay actions ---
+    if (eaglerContinueBtn) eaglerContinueBtn.onclick = () => { window.open('https://kingnoobisw.github.io/eaglercraft/', '_blank', 'width=1024,height=768'); };
+    if (eaglerCloseBtn) eaglerCloseBtn.onclick = () => { if (eaglerOverlay) eaglerOverlay.style.display = 'none'; };
+
     // --- Redirect key ---
-    document.addEventListener("keydown", e => {
-      if (e.key === ">") {
-        const link = localStorage.getItem("redirectLink") || "https://classroom.google.com/h";
+    document.addEventListener('keydown', e => {
+      if (e.key === '>') {
+        const link = localStorage.getItem('redirectLink') || 'https://classroom.google.com/h';
         window.location.href = link;
       }
     });
 
     // --- SOUNDBOARD LOGIC ---
     let uploadedBlob = null;
+    if (soundUpload) {
+      soundUpload.onchange = () => {
+        const file = soundUpload.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = e => {
+            uploadedBlob = e.target.result;
+            alert('✅ Sound loaded! Enter a name and click Save Sound.');
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+    }
 
-    soundUpload.onchange = () => {
-      const file = soundUpload.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          uploadedBlob = e.target.result;
-          alert("✅ Sound loaded! Enter a name and click 'Save Sound'.");
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-
-    saveSoundBtn.onclick = () => {
-      const name = soundName.value.trim() || "Unnamed Sound";
-      if (uploadedBlob) {
-        const sounds = JSON.parse(localStorage.getItem("savedSounds") || "[]");
-        sounds.push({ name, data: uploadedBlob });
-        localStorage.setItem("savedSounds", JSON.stringify(sounds));
-        uploadedBlob = null;
-        soundName.value = "";
-        soundUpload.value = "";
-        loadSavedSounds();
-        alert("🎵 Sound saved!");
-      } else {
-        alert("Please upload a sound first.");
-      }
-    };
+    if (saveSoundBtn) {
+      saveSoundBtn.onclick = () => {
+        const name = (soundName && soundName.value.trim()) || 'Unnamed Sound';
+        if (uploadedBlob) {
+          const sounds = JSON.parse(localStorage.getItem('savedSounds') || '[]');
+          sounds.push({ name, data: uploadedBlob });
+          localStorage.setItem('savedSounds', JSON.stringify(sounds));
+          uploadedBlob = null;
+          if (soundName) soundName.value = '';
+          if (soundUpload) soundUpload.value = '';
+          loadSavedSounds();
+          alert('🎵 Sound saved!');
+        } else {
+          alert('Please upload a sound first.');
+        }
+      };
+    }
 
     function loadSavedSounds() {
-      savedSoundsDiv.innerHTML = "";
-      const sounds = JSON.parse(localStorage.getItem("savedSounds") || "[]");
+      if (!savedSoundsDiv) return;
+      savedSoundsDiv.innerHTML = '';
+      const sounds = JSON.parse(localStorage.getItem('savedSounds') || '[]');
       if (sounds.length === 0) {
-        savedSoundsDiv.innerHTML = "<p>No sounds saved yet.</p>";
+        savedSoundsDiv.innerHTML = '<div style="color:#888">No sounds saved yet.</div>';
         return;
       }
       sounds.forEach((s, i) => {
-        const container = document.createElement("div");
-        const playBtn = document.createElement("button");
-        playBtn.textContent = `▶ ${s.name}`;
-        playBtn.onclick = () => new Audio(s.data).play();
-
-        const delBtn = document.createElement("button");
-        delBtn.textContent = "🗑️";
-        delBtn.className = "deleteBtn";
-        delBtn.onclick = () => {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.gap = '8px';
+        row.style.marginTop = '8px';
+        const play = document.createElement('button');
+        play.textContent = `▶ ${s.name}`;
+        play.style.flex = '1';
+        play.style.padding = '8px';
+        play.onclick = () => new Audio(s.data).play();
+        const del = document.createElement('button');
+        del.textContent = '🗑';
+        del.className = 'deleteBtn';
+        del.onclick = () => {
           if (confirm(`Delete "${s.name}"?`)) {
             const updated = sounds.filter((_, idx) => idx !== i);
-            localStorage.setItem("savedSounds", JSON.stringify(updated));
+            localStorage.setItem('savedSounds', JSON.stringify(updated));
             loadSavedSounds();
           }
         };
-
-        playBtn.appendChild(delBtn);
-        container.appendChild(playBtn);
-        savedSoundsDiv.appendChild(container);
+        row.appendChild(play);
+        row.appendChild(del);
+        savedSoundsDiv.appendChild(row);
       });
     }
 
-    // Load on start
+    // Initial load
     loadSavedSounds();
   </script>
 </body>
 </html>
+```
